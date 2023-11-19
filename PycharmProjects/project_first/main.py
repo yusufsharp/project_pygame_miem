@@ -33,6 +33,9 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (128, 128))
         self.rect = self.image.get_rect()
 
+        self.stand_image = pygame.image.load("objects/assets_sprites/idle_hero/Swordsman0000.png")
+        self.stand_image = pygame.transform.scale(self.stand_image, (128, 128))
+
         # Position and direction
         self.vx = 0  # компонента скорости по оси х
         self.pos = vec((340, 240))  # вектор, представляющий позицию персонажа на экране
@@ -45,26 +48,25 @@ class Player(pygame.sprite.Sprite):
         self.move_frame = 0  # отслеживание текущего кадра персонажа
 
         # Анимация бега вправо
-        run_ani_r = [pygame.image.load("objects/assets_sprites/walking_hero/hero-running01_R.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running02_R.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running03_R.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running04_R.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running05_R.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running06_R.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running07_R.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running08_R.png")
-                     ]
+
+        self.run_ani_r = [pygame.image.load("objects/assets_sprites/walking_hero/hero-running01_R.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running02_R.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running03_R.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running04_R.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running05_R.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running06_R.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running07_R.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running08_R.png")]
 
         # анимка влево
-        run_ani_l = [pygame.image.load("objects/assets_sprites/walking_hero/hero-running01_L.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running02_L.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running03_L.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running04_L.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running05_L.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running06_L.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running07_L.png"),
-                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running08_L.png")
-                     ]
+        self.run_ani_l = [pygame.image.load("objects/assets_sprites/walking_hero/hero-running01_L.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running02_L.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running03_L.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running04_L.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running05_L.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running06_L.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running07_L.png"),
+                          pygame.image.load("objects/assets_sprites/walking_hero/hero-running08_L.png")]
 
     def move(self):
         self.acc = vec(0, 0.5)  # ускорение персонажа вниз - имитация гравитации
@@ -103,7 +105,26 @@ class Player(pygame.sprite.Sprite):
                     self.jumping = False
 
     def update(self):
-        pass
+        if self.move_frame > 7:
+            self.move_frame = 0
+            return
+        if self.jumping == False and self.running == True:
+            if self.vel.x > 0:
+                self.image = self.run_ani_r[self.move_frame]
+                self.direction = "RIGHT"
+            else:
+                self.image = self.run_ani_l[self.move_frame]
+                self.direction = "LEFT"
+            self.move_frame += 1
+
+        if abs(self.vel.x) < 0.2 and self.move_frame != 0:
+            self.move_frame = 0
+            if self.direction == "RIGHT":
+                self.image = self.run_ani_r[self.move_frame]
+            elif self.direction == "LEFT":
+                self.image = self.run_ani_l[self.move_frame]
+        elif not self.running:
+            self.image = self.stand_image
 
     def attack(self):
         pass
@@ -140,6 +161,7 @@ while True:
     screen.fill(BACKGROUND)
 
     # render func
+    player.update()
     player.move()
     ground.render()
     screen.blit(player.image, player.rect)
