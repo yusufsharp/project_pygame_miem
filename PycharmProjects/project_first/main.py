@@ -41,6 +41,30 @@ class Player(pygame.sprite.Sprite):
         self.direction = "RIGHT"
 
         self.jumping = False
+        self.running = False
+        self.move_frame = 0  # отслеживание текущего кадра персонажа
+
+        # Анимация бега вправо
+        run_ani_r = [pygame.image.load("objects/assets_sprites/walking_hero/hero-running01_R.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running02_R.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running03_R.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running04_R.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running05_R.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running06_R.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running07_R.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running08_R.png")
+                     ]
+
+        # анимка влево
+        run_ani_l = [pygame.image.load("objects/assets_sprites/walking_hero/hero-running01_L.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running02_L.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running03_L.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running04_L.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running05_L.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running06_L.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running07_L.png"),
+                     pygame.image.load("objects/assets_sprites/walking_hero/hero-running08_L.png")
+                     ]
 
     def move(self):
         self.acc = vec(0, 0.5)  # ускорение персонажа вниз - имитация гравитации
@@ -52,9 +76,9 @@ class Player(pygame.sprite.Sprite):
 
         pressed_keys = pygame.key.get_pressed()
 
-        if pressed_keys[K_LEFT]:
+        if pressed_keys[K_a]:
             self.acc.x = -ACC  # бежим влево - отрицательное ускорение
-        if pressed_keys[K_RIGHT]:
+        if pressed_keys[K_d]:
             self.acc.x = ACC
 
         self.acc.x += self.vel.x * FRIC
@@ -85,7 +109,15 @@ class Player(pygame.sprite.Sprite):
         pass
 
     def jump(self):
-        pass
+        self.rect.x += 1
+
+        hits = pygame.sprite.spritecollide(self, ground_group, False)
+
+        self.rect.x -= 1
+
+        if hits and not self.jumping:
+            self.jumping = True
+            self.vel.y = -12
 
 
 # classes
@@ -101,6 +133,9 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.jump()
 
     screen.fill(BACKGROUND)
 
