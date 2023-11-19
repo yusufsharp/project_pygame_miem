@@ -123,8 +123,8 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.run_ani_r[self.move_frame]
             elif self.direction == "LEFT":
                 self.image = self.run_ani_l[self.move_frame]
-        elif not self.running:
-            self.image = self.stand_image
+        # elif not self.running:
+        #     self.image = self.stand_image
 
     def attack(self):
         pass
