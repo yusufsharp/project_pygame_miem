@@ -1,12 +1,26 @@
-import pygame as pg
+import pygame as pg, pygame
 from pygame import *
 import sys
-from utils.settings import *
 import blocks
 from blocks import Platform
+from settings import *
+from pygame.locals import *
+import player
+from player import Player
+
+pg.init()
 
 
-entities = pg.sprite.Group()
+background_image = pg.image.load(BACKGROUND_IMAGE)
+background_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_WIDTH))
+overlay = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+overlay.fill((0, 0, 0))  # Черный цвет для затемнения
+overlay.set_alpha(230)  # Настройка уровня прозрачности (0 - полностью прозрачный, 255 - непрозрачный)
+
+screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+player_instance = Player()
+
+entities = pygame.sprite.Group()
 platforms = []
 
 x = y = 0
@@ -20,33 +34,34 @@ for row in level:
     y += PLATFORM_HEIGHT
     x = 0
 
-background_image = pg.image.load(BACKGROUND_IMAGE)
-background_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_WIDTH))
-overlay = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
-overlay.fill((0, 0, 0))  # Черный цвет для затемнения
-overlay.set_alpha(230)  # Настройка уровня прозрачности (0 - полностью прозрачный, 255 - непрозрачный)
-
 def main():
-    pg.init()
-    screen = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
-
-    bg.fill(Color(BACKGROUND_COLOR))
     run = True
     while run:
+        player_instance.gravity_check(entities)
         clock = pg.time.Clock()
+        bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                run = False
-                pg.quit()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    player_instance.jump(entities)
 
+        bg.fill(Color(BACKGROUND_COLOR))
         screen.blit(background_image, (0, 0))
         screen.blit(overlay, (0, 0))
+
         entities.draw(screen)
-        pg.display.update()
-        clock.tick(60)
+
+
+        player_instance.update()
+        player_instance.move(entities)
+        screen.blit(player_instance.image, player_instance.rect)
+
+        pygame.display.update()
+        FPS_CLOCK.tick(FPS)
 
 if __name__ == '__main__':
     main()

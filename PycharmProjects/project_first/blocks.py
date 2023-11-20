@@ -1,8 +1,7 @@
 import pygame as pg
 from pygame import *
 import sys
-from utils.settings import *
-
+from settings import *
 
 class Platform(sprite.Sprite):
     def __init__(self, x, y, image_path):

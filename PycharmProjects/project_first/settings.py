@@ -1,5 +1,15 @@
+import pygame.time
 WINDOW_WIDTH = 1920
 WINDOW_HEIGHT = 1080
+
+# physics
+ACC = 1
+FRIC = -0.2125
+COUNT = 0
+FPS = 60
+FPS_CLOCK = pygame.time.Clock()
+
+
 BACKGROUND_IMAGE = 'images/Background.jpg'
 BACKGROUND_COLOR = '#320236'
 PLATFORM_WIDTH = 32
@@ -17,6 +27,7 @@ IMGS_PLATFORM = {
        '*': "images/blocks/IndustrialTile_68.png", #сводка
        '&': 'images/blocks/IndustrialTile_52.png', #платформа от стены
 }
+
 level = [
        "1----------------------------------------------------------2",
        "/                                                          \\",
@@ -50,3 +61,4 @@ level = [
        "/                                                          \\",
        "/                                                          \\",
        "3__________________________________________________________4"]
+vec = pygame.math.Vector2  # creating vector object
