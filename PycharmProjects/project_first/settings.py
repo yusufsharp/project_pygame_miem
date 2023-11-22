@@ -3,7 +3,7 @@ WINDOW_WIDTH = 1920
 WINDOW_HEIGHT = 1080
 
 # physics
-ACC = 1
+ACC = 2
 FRIC = -0.2125
 COUNT = 0
 FPS = 60
