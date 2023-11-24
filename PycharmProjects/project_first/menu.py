@@ -16,16 +16,17 @@ def menuFunc():
 
     button_width = 300
     button_height = 70
+    font_path = 'fonts/thin_pixel-7.ttf'
 
     login_button_rect = pg.Rect((WINDOW_WIDTH - button_width) // 2, 200, button_width, button_height)
     register_button_rect = pg.Rect((WINDOW_WIDTH - button_width) // 2, 300, button_width, button_height)
     pg.draw.rect(screen, (200, 200, 200), login_button_rect)
     pg.draw.rect(screen, (200, 200, 200), register_button_rect)
-    font = pg.font.Font(None, 36)
+    font = pg.font.Font(font_path, 36)
     login_text = font.render("Войти", True, (0, 0, 0))
     register_text = font.render("Зарегистрироваться", True, (0, 0, 0))
-    screen.blit(login_text, (login_button_rect.x + 110, login_button_rect.y + 25))
-    screen.blit(register_text, (register_button_rect.x + 30, register_button_rect.y + 25))
+    screen.blit(login_text, (login_button_rect.x + 120, login_button_rect.y + 15))
+    screen.blit(register_text, (register_button_rect.x + 60, register_button_rect.y + 15))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
