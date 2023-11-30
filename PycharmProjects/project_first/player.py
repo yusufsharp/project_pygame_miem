@@ -4,7 +4,6 @@ from settings import *
 from pygame.locals import *
 from blocks import Platform
 
-
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -83,24 +82,7 @@ class Player(pygame.sprite.Sprite):
                     self.vel.y = 0
                     self.jumping = False
 
-
-
-    def collide(self, platforms):
-        for p in platforms:
-            if pygame.sprite.spritecollideany(self, p):
-                if self.vel.x > 0:
-                    self.rect.right = p.rect.left
-                if self.vel.x < 0:
-                    self.rect.left = p.rect.right
-
-                if self.vel.y > 0:
-                    self.rect.bottom = p.rect.top
-                if self.vel.y < 0:
-                    self.rect.top = p.rect.bottom
-
-
-    def update(self, platforms):
-        self.collide(platforms)
+    def update(self):
         if self.move_frame > 7:
             self.move_frame = 0
             return

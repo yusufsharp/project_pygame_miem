@@ -56,7 +56,7 @@ def main():
         entities.draw(screen)
 
 
-        player_instance.update(platforms)
+        player_instance.update()
         player_instance.move(entities)
         screen.blit(player_instance.image, player_instance.rect)
 
