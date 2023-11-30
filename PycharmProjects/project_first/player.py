@@ -4,6 +4,7 @@ from settings import *
 from pygame.locals import *
 from blocks import Platform
 
+
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -65,22 +66,28 @@ class Player(pygame.sprite.Sprite):
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
 
-        if self.pos.x > WINDOW_WIDTH:
-            self.pos.x = 0
-        if self.pos.x < 0:
-            self.pos.x = WINDOW_WIDTH
+        # if self.pos.x > WINDOW_WIDTH:
+        #     self.pos.x = 0
+        # if self.pos.x < 0:
+        #     self.pos.x = WINDOW_WIDTH
 
         self.rect.midbottom = self.pos  # обновляем прямоугольник, который используется для отрисовки персонажа
 
     def gravity_check(self, entities):
         hits = pygame.sprite.spritecollide(self, entities, False)
-        if self.vel.y > 0:
-            if hits:
-                lowest = hits[0]
-                if self.pos.y < lowest.rect.bottom:
-                    self.pos.y = lowest.rect.top + 1
-                    self.vel.y = 0
-                    self.jumping = False
+        for hit in hits:
+            if self.vel.y > 0 and self.pos.y < hit.rect.bottom:
+                self.pos.y = hit.rect.top + 1
+                self.vel.y = 0
+                self.jumping = False
+
+    # def collide_check(self, entities):
+    #     hits = pygame.sprite.spritecollide(self, entities, False)
+    #     if self.vel.x > 0 or self.vel.x < 0:
+    #         if hits:
+
+
+
 
     def update(self):
         if self.move_frame > 7:
