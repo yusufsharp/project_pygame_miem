@@ -1,6 +1,7 @@
 import pygame.time
-WINDOW_WIDTH = 1920
-WINDOW_HEIGHT = 1080
+WINDOW_WIDTH = 1080
+WINDOW_HEIGHT = 720
+#1920 1080
 
 # physics
 ACC = 1

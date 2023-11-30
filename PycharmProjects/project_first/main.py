@@ -67,7 +67,6 @@ def main():
             screen.blit(player_instance.image, player_instance.rect)
 
         pygame.display.update()
-        FPS_CLOCK.tick(FPS)
 
 if __name__ == '__main__':
     main()
