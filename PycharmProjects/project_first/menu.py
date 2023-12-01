@@ -23,8 +23,6 @@ def menuFunc():
         font_path = 'fonts/thin_pixel-7.ttf'
         font = pg.font.Font(font_path, 36)
 
-        button_width = 300
-        button_height = 70
         login_button_rect = draw_rect(screen, 35, 20, 30, 10)
         register_button_rect = draw_rect(screen, 35, 40, 30, 10)
 
@@ -68,37 +66,84 @@ def draw_rect(screen, x, y, width, height, clr=(255, 255, 255), border=20, borde
 
 def menu_reg_func(font, screen):
     input_active = True
-    text = ''
     reg_window = draw_rect(screen, 20, 20, 60, 50, clr=(255, 255, 255, 128))
 
     # треба настроить прозрачность
     name_window = draw_rect(screen, 30, 30, 40, 10, clr=(0, 0, 0), border_width=2)
     pass_window = draw_rect(screen, 30, 45, 40, 10, clr=(0, 0, 0), border_width=2)
+    init_window = draw_rect(screen, 45, 60, 10, 5, clr=(255, 0, 0), border_width=3)
 
     name_text = font.render("Логин: ", True, (200, 200, 200))
     pass_text = font.render("Пароль: ", True, (200, 200, 200))
-
+    init_text = font.render("Играть", True, (0, 0, 0))
+    # здесь задаем тексты логина пароля
     name_text_rect = name_text.get_rect()
     pass_text_rect = pass_text.get_rect()
+    init_text_rect = init_text.get_rect()
     name_text_rect.center = ((name_window.right + name_window.left) // 2,
                              (name_window.bottom + name_window.top) // 2)
     pass_text_rect.center = ((pass_window.right + pass_window.left) // 2,
                              (pass_window.bottom + pass_window.top) // 2)
+    init_text_rect.center = ((init_window.right + init_window.left + 2) // 2,
+                             (init_window.bottom + init_window.top - 6) // 2)
+
     screen.blit(name_text, name_text_rect)
     screen.blit(pass_text, pass_text_rect)
+    screen.blit(init_text, init_text_rect)
+    # для активации поля ввода
+
+    active_name = False
+    active_pass = False
+    text_name = ''
+    text_pass = ''
+
     while input_active:
         pygame.font.init()
-        text_surface = font.render(text, True, (0, 0, 0))
-        screen.blit(text_surface, (200, 200))
 
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    # send_post_request(text, '1234')
-                    text = ""
-                    input_active = False
-                elif event.key == pygame.K_BACKSPACE:
-                    text = text[:-1]
-                else:
-                    text += event.unicode
-        pygame.display.update()
+            if event.type == pygame.QUIT:
+                input_active = False
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if name_window.collidepoint(event.pos):
+                    active_name = not active_name
+                    active_pass = False
+                    pygame.draw.rect(screen, (0, 255, 0), name_window, 2, border_radius=20)
+                    pygame.draw.rect(screen, (0, 0, 0), pass_window, 2, border_radius=20)
+                elif pass_window.collidepoint(event.pos):
+                    active_pass = not active_pass
+                    active_name = False
+                    pygame.draw.rect(screen, (0, 255, 0), pass_window, 2, border_radius=20)
+                    pygame.draw.rect(screen, (0, 0, 0), name_window, 2, border_radius=20)
+                elif init_window.collidepoint(event.pos):
+                    if text_name != '' and text_pass != '':
+                        send_post_request(text_name, text_pass)
+                        input_active = False
+
+            elif event.type == pygame.KEYDOWN:
+                if active_name:
+                    text_name = text_bar_updating(screen, event, font, name_window, text_name, name_text_rect)
+                elif active_pass:
+                    text_pass = text_bar_updating(screen, event, font, pass_window, text_pass, pass_text_rect)
+
+                if text_name != '' and text_pass != '':
+                    pygame.draw.rect(screen, (0, 255, 0), init_window, 3, border_radius=20)
+        pygame.display.flip()
+
+
+def text_bar_updating(screen, event, font, window, text, text_rect):
+    pygame.draw.rect(screen, (255, 255, 255), window)
+    pygame.draw.rect(screen, (0, 255, 0), window, 2, border_radius=20)
+    if event.key == pygame.K_RETURN:
+        text = ""
+    elif event.key == pygame.K_BACKSPACE:
+        text = text[:-1]
+    else:
+        text += event.unicode
+    text_surface = font.render(text, True, pygame.Color('dodgerblue2'))
+    text_surface_rect = text_surface.get_rect()
+    text_surface_rect.center = ((text_rect.right + text_rect.left) // 2,
+                                (text_rect.bottom + text_rect.top) // 2)
+    screen.blit(text_surface, text_surface_rect)
+
+    return text
