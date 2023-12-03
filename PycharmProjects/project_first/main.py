@@ -18,10 +18,11 @@ overlay.fill((0, 0, 0))  # Черный цвет для затемнения
 overlay.set_alpha(230)  # Настройка уровня прозрачности (0 - полностью прозрачный, 255 - непрозрачный)
 
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-player_instance = Player()
 
 entities = pygame.sprite.Group()
 platforms = []
+hero = Player(55,55) # создаем героя по (x,y) координатам
+entities.add(hero)
 
 x = y = 0
 for row in level:
@@ -36,29 +37,38 @@ for row in level:
 
 def main():
     run = True
+    left = right = up = False  # по умолчанию — стоим
     while run:
-        player_instance.gravity_check(entities)
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    player_instance.jump(entities)
+            if e.type == KEYDOWN and e.key == K_LEFT:
+                left = True
+            if e.type == KEYDOWN and e.key == K_RIGHT:
+                right = True
+
+            if e.type == KEYUP and e.key == K_RIGHT:
+                right = False
+            if e.type == KEYUP and e.key == K_LEFT:
+                left = False
+
+            if e.type == KEYDOWN and e.key == K_UP:
+                up = True
+
+            if e.type == KEYUP and e.key == K_UP:
+                up = False
 
         bg.fill(Color(BACKGROUND_COLOR))
         screen.blit(background_image, (0, 0))
         screen.blit(overlay, (0, 0))
 
         entities.draw(screen)
-
-
-        player_instance.update()
-        player_instance.move(entities)
-        screen.blit(player_instance.image, player_instance.rect)
+        hero.update(left, right, up, platforms)
+        entities.draw(screen)
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
