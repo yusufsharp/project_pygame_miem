@@ -6,10 +6,26 @@ from settings import *
 
 
 def send_post_request(username, password):
-    url = "http://localhost:8000/api/player_info/"
+    url = "https://zxces.pythonanywhere.com/myapp/api/player_info/"
     data = {"login": username, "password": password}
     response = requests.post(url, data=data)
     print(response.text)
+
+
+def send_get_request(username):
+    url = "https://zxces.pythonanywhere.com/myapp/api/player_info/"
+    params = {"login": username}
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        player_info = response.json()
+        print("Игрок найден. Информация о игроке:", player_info)
+        return True
+    elif response.status_code == 404:
+        print("Игрок не найден.")
+        return False
+    else:
+        print(f"Произошла ошибка: {response.status_code}, {response.text}")
+        return False
 
 
 def menuFunc():
@@ -117,7 +133,12 @@ def menu_reg_func(font, screen):
                     pygame.draw.rect(screen, (0, 0, 0), name_window, 2, border_radius=20)
                 elif init_window.collidepoint(event.pos):
                     if text_name != '' and text_pass != '':
-                        send_post_request(text_name, text_pass)
+                        user_exists = send_get_request(text_name)
+                        if not user_exists:
+                            send_post_request(text_name, text_pass)
+                            print('Игрок проходит регистрацию')
+                        else:
+                            print('Игрок уже существует')
                         input_active = False
 
             elif event.type == pygame.KEYDOWN:
