@@ -7,7 +7,7 @@ from settings import *
 from pygame.locals import *
 import player
 from player import Player
-
+from menu import menuFunc
 pg.init()
 
 
@@ -37,38 +37,41 @@ for row in level:
 
 def main():
     run = True
+    reg = False
     left = right = up = False  # по умолчанию — стоим
     while run:
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+        if not reg:
+            reg = menuFunc()
+        else:
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if e.type == KEYDOWN and e.key == K_LEFT:
+                    left = True
+                if e.type == KEYDOWN and e.key == K_RIGHT:
+                    right = True
 
-        for e in pygame.event.get():
-            if e.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if e.type == KEYDOWN and e.key == K_LEFT:
-                left = True
-            if e.type == KEYDOWN and e.key == K_RIGHT:
-                right = True
+                if e.type == KEYUP and e.key == K_RIGHT:
+                    right = False
+                if e.type == KEYUP and e.key == K_LEFT:
+                    left = False
 
-            if e.type == KEYUP and e.key == K_RIGHT:
-                right = False
-            if e.type == KEYUP and e.key == K_LEFT:
-                left = False
+                if e.type == KEYDOWN and e.key == K_UP:
+                    up = True
 
-            if e.type == KEYDOWN and e.key == K_UP:
-                up = True
+                if e.type == KEYUP and e.key == K_UP:
+                    up = False
 
-            if e.type == KEYUP and e.key == K_UP:
-                up = False
+            bg.fill(Color(BACKGROUND_COLOR))
+            screen.blit(background_image, (0, 0))
+            screen.blit(overlay, (0, 0))
 
-        bg.fill(Color(BACKGROUND_COLOR))
-        screen.blit(background_image, (0, 0))
-        screen.blit(overlay, (0, 0))
-
-        entities.draw(screen)
-        hero.update(left, right, up, platforms)
-        entities.draw(screen)
+            entities.draw(screen)
+            hero.update(left, right, up, platforms)
+            entities.draw(screen)
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
