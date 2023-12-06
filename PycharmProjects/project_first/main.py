@@ -7,9 +7,9 @@ from settings import *
 from pygame.locals import *
 import player
 from player import Player
+import pyganim
 
 pg.init()
-
 
 background_image = pg.image.load(BACKGROUND_IMAGE)
 background_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_WIDTH))
@@ -18,10 +18,12 @@ overlay.fill((0, 0, 0))  # Черный цвет для затемнения
 overlay.set_alpha(230)  # Настройка уровня прозрачности (0 - полностью прозрачный, 255 - непрозрачный)
 
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+icon = pygame.image.load('images/icon.png')
+pygame.display.set_icon(icon)
 
 entities = pygame.sprite.Group()
 platforms = []
-hero = Player(55,55) # создаем героя по (x,y) координатам
+hero = Player(55, 55)  # создаем героя по (x,y) координатам
 entities.add(hero)
 
 x = y = 0
@@ -34,6 +36,7 @@ for row in level:
         x += PLATFORM_WIDTH
     y += PLATFORM_HEIGHT
     x = 0
+
 
 def main():
     run = True
@@ -72,6 +75,7 @@ def main():
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
+
 
 if __name__ == '__main__':
     main()
