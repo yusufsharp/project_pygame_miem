@@ -138,12 +138,7 @@ class Player(sprite.Sprite):
             if self.direction is False:
                 self.boltAnimAttackLeft.blit(self.image, (0, 0))
 
-
-
-
-
-
-        self.onGround = False;  # Мы не знаем, когда мы на земле((
+        self.onGround = False  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel
         self.collide(0, self.yvel, platforms)
 
