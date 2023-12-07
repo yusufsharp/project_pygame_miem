@@ -1,10 +1,10 @@
 from pygame import *
 
 MOVE_SPEED = 7
-WIDTH = 22
-HEIGHT = 32
+WIDTH = 64
+HEIGHT = 64
 COLOR = "#888888"
-JUMP_POWER = 10
+JUMP_POWER = 13
 GRAVITY = 0.35 # Сила, которая будет тянуть нас вниз
 
 class Player(sprite.Sprite):

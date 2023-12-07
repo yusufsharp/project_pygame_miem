@@ -2,7 +2,7 @@ import pygame as pg, pygame
 from pygame import *
 import sys
 import blocks
-from blocks import Platform
+from blocks import *
 from settings import *
 from pygame.locals import *
 import player
@@ -21,8 +21,12 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 entities = pygame.sprite.Group()
 platforms = []
-hero = Player(55,55) # создаем героя по (x,y) координатам
+hero = Player(2064,100) # создаем героя по (x,y) координатам
 entities.add(hero)
+
+moving_platform = MovingPlatform(2064, 500, IMGS_PLATFORM['^'], 2064, 2304, 3)
+entities.add(moving_platform)
+platforms.append(moving_platform)
 
 x = y = 0
 for row in level:
@@ -35,10 +39,33 @@ for row in level:
     y += PLATFORM_HEIGHT
     x = 0
 
+class Camera(object):
+    def __init__(self, camera_func, width, height):
+        self.camera_func = camera_func
+        self.state = Rect(0,0, width, height)
+
+    def apply(self, target):
+        return target.rect.move(self.state.topleft)
+
+    def update(self, target):
+        self.state = self.camera_func(self.state, target.rect)
+
+def camera_configure(camera, target_rect):
+    l, t, _, _ = target_rect
+    _, _, w, h = camera
+    l, t = -l + WINDOW_WIDTH / 2, -t + WINDOW_HEIGHT / 2
+
+
+    return Rect(l, t, w, h)
+
 def main():
     run = True
-    reg = False
+    reg = True
     left = right = up = False  # по умолчанию — стоим
+    total_level_width = len(level[0]) * PLATFORM_WIDTH
+    total_level_height = len(level[0]) * PLATFORM_HEIGHT
+
+    camera = Camera(camera_configure, total_level_width, total_level_height)
     while run:
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -69,9 +96,11 @@ def main():
             screen.blit(background_image, (0, 0))
             screen.blit(overlay, (0, 0))
 
-            entities.draw(screen)
+            camera.update(hero)
+            for e in entities:
+                screen.blit(e.image, camera.apply(e))
+            moving_platform.update()
             hero.update(left, right, up, platforms)
-            entities.draw(screen)
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
