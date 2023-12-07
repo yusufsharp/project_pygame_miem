@@ -1,61 +1,20 @@
 from pygame import *
 import pyganim
-import pygame
 
 MOVE_SPEED = 7
-WIDTH = 32
-HEIGHT = 32
+WIDTH = 64
+HEIGHT = 64
 COLOR = "#888888"
-JUMP_POWER = 10
+JUMP_POWER = 13
 GRAVITY = 0.35  # Сила, которая будет тянуть нас вниз
 
-ANIMATION_DELAY = 0.1
-ANIMATION_RIGHT = [
-    (pygame.transform.scale(pygame.image.load("assets_sprites/idle/Idle-Sheet.png"), (32, 32)), 0.1)
-]
-
-ANIMATION_LEFT = [
-    (pygame.transform.scale(pygame.image.load("assets_sprites/idle/Idle-Sheet.png"), (32, 32)), 0.1)
-]
-
-ANIMATION_JUMP_RIGHT = [
-    'assets_sprites/Jump-All/jump_right1.png',
-    'assets_sprites/Jump-All/jump_right2.png',
-    'assets_sprites/Jump-All/jump_right3.png',
-    'assets_sprites/Jump-All/jump_right4.png',
-    'assets_sprites/Jump-All/jump_right5.png',
-    'assets_sprites/Jump-All/jump_right6.png',
-    'assets_sprites/Jump-All/jump_right7.png',
-    'assets_sprites/Jump-All/jump_right8.png',
-    'assets_sprites/Jump-All/jump_right9.png',
-    'assets_sprites/Jump-All/jump_right10.png',
-    'assets_sprites/Jump-All/jump_right11.png',
-    'assets_sprites/Jump-All/jump_right12.png',
-    'assets_sprites/Jump-All/jump_right13.png',
-    'assets_sprites/Jump-All/jump_right14.png'
-]
-
-
-ANIMATION_JUMP_LEFT = [
-    'assets_sprites/Jump-All/jump_left1.png',
-    'assets_sprites/Jump-All/jump_left2.png',
-    'assets_sprites/Jump-All/jump_left3.png',
-    'assets_sprites/Jump-All/jump_left4.png',
-    'assets_sprites/Jump-All/jump_left5.png',
-    'assets_sprites/Jump-All/jump_left6.png',
-    'assets_sprites/Jump-All/jump_left7.png',
-    'assets_sprites/Jump-All/jump_left8.png',
-    'assets_sprites/Jump-All/jump_left9.png',
-    'assets_sprites/Jump-All/jump_left10.png',
-    'assets_sprites/Jump-All/jump_left11.png',
-    'assets_sprites/Jump-All/jump_left12.png',
-    'assets_sprites/Jump-All/jump_left13.png',
-    'assets_sprites/Jump-All/jump_left14.png'
-]
-
-
-ANIMATION_JUMP = [("assets_sprites/idle/Idle-Sheet.png", 0.1)]
-ANIMATION_STAY = [("assets_sprites/idle/Idle-Sheet.png", 0.1)]
+ANIMATION_DELAY = 60
+ANIMATION_RIGHT = [f"assets_sprites/Run/run_r{i}.png" for i in range(1, 9)]
+ANIMATION_LEFT = [f"assets_sprites/Run/run_l{i}.png" for i in range(1, 9)]
+ANIMATION_JUMP_RIGHT = [f'assets_sprites/Jump-All/jump_r{i}.png' for i in range(1, 9)]
+ANIMATION_JUMP_LEFT = [f'assets_sprites/Jump-All/jump_l{i}.png' for i in range(1, 9)]
+ANIMATION_STAY_LEFT = [f"assets_sprites/idle/Idle_l{i}.png" for i in range(4)]
+ANIMATION_STAY_RIGHT = [f"assets_sprites/idle/Idle_r{i}.png" for i in range(5)]
 
 
 class Player(sprite.Sprite):
@@ -72,6 +31,8 @@ class Player(sprite.Sprite):
         self.image.fill(Color(COLOR))
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
 
+        self.direction = True
+
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
         #        Анимация движения вправо
         boltAnim = []
@@ -86,27 +47,46 @@ class Player(sprite.Sprite):
         self.boltAnimLeft = pyganim.PygAnimation(boltAnim)
         self.boltAnimLeft.play()
 
-        self.boltAnimStay = pyganim.PygAnimation(ANIMATION_STAY)
-        self.boltAnimStay.play()
-        self.boltAnimStay.blit(self.image, (0, 0))  # По-умолчанию, стоим
+        boltAnim = []
+        for anim in ANIMATION_STAY_RIGHT:
+            boltAnim.append((anim, ANIMATION_DELAY))
+        self.boltAnimStayRight = pyganim.PygAnimation(boltAnim)
+        self.boltAnimStayRight.play()
 
-        self.boltAnimJumpLeft = pyganim.PygAnimation(ANIMATION_JUMP_LEFT)
-        self.boltAnimJumpLeft.play()
+        boltAnim = []
+        for anim in ANIMATION_STAY_LEFT:
+            boltAnim.append((anim, ANIMATION_DELAY))
+        self.boltAnimStayLeft = pyganim.PygAnimation(boltAnim)
+        self.boltAnimStayLeft.play()
 
-        self.boltAnimJumpRight = pyganim.PygAnimation(ANIMATION_JUMP_RIGHT)
+        if self.direction:
+            self.boltAnimStayRight.blit(self.image, (0, 0))  # По-умолчанию, стоим
+        else:
+            self.boltAnimStayLeft.blit(self.image, (0, 0))
+
+        boltAnim = []
+        for anim in ANIMATION_JUMP_RIGHT:
+            boltAnim.append((anim, ANIMATION_DELAY))
+        self.boltAnimJumpRight = pyganim.PygAnimation(boltAnim)
         self.boltAnimJumpRight.play()
 
-        self.boltAnimJump = pyganim.PygAnimation(ANIMATION_JUMP)
-        self.boltAnimJump.play()
+        boltAnim = []
+        for anim in ANIMATION_JUMP_LEFT:
+            boltAnim.append((anim, ANIMATION_DELAY))
+        self.boltAnimJumpLeft = pyganim.PygAnimation(boltAnim)
+        self.boltAnimJumpLeft.play()
 
     def update(self, left, right, up, platforms):
         if up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
                 self.yvel = -JUMP_POWER
             self.image.fill(Color(COLOR))
-            self.boltAnimJump.blit(self.image, (0, 0))
-
+            if self.direction:
+                self.boltAnimJumpRight.blit(self.image, (0, 0))
+            else:
+                self.boltAnimJumpLeft.blit(self.image, (0, 0))
         if left:
+            self.direction = False
             self.xvel = -MOVE_SPEED  # Лево = x- n
             self.image.fill(Color(COLOR))
             if up:  # для прыжка влево есть отдельная анимация
@@ -115,6 +95,7 @@ class Player(sprite.Sprite):
                 self.boltAnimLeft.blit(self.image, (0, 0))
 
         if right:
+            self.direction = True
             self.xvel = MOVE_SPEED  # Право = x + n
             self.image.fill(Color(COLOR))
             if up:
@@ -126,8 +107,10 @@ class Player(sprite.Sprite):
             self.xvel = 0
             if not up:
                 self.image.fill(Color(COLOR))
-                self.boltAnimStay.blit(self.image, (0, 0))
-
+                if self.direction:
+                    self.boltAnimStayRight.blit(self.image, (0, 0))
+                else:
+                    self.boltAnimStayLeft.blit(self.image, (0, 0))
         if not self.onGround:
             self.yvel += GRAVITY
 
