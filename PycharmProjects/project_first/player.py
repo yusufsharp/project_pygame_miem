@@ -2,9 +2,11 @@ from pygame import *
 import pyganim
 
 MOVE_SPEED = 7
+ATTACK_WIDTH = 84
+ATTACK_HEIGHT = 84
 WIDTH = 64
 HEIGHT = 64
-COLOR = "#888888"
+COLOR = "#000000"
 JUMP_POWER = 13
 GRAVITY = 0.35  # Сила, которая будет тянуть нас вниз
 
@@ -15,6 +17,8 @@ ANIMATION_JUMP_RIGHT = [f'assets_sprites/Jump-All/jump_r{i}.png' for i in range(
 ANIMATION_JUMP_LEFT = [f'assets_sprites/Jump-All/jump_l{i}.png' for i in range(1, 9)]
 ANIMATION_STAY_LEFT = [f"assets_sprites/idle/Idle_l{i}.png" for i in range(4)]
 ANIMATION_STAY_RIGHT = [f"assets_sprites/idle/Idle_r{i}.png" for i in range(5)]
+ANIMATION_ATTACK_RIGHT = [f'assets_sprites/Attack-01/attack_r{i}.png' for i in range(1, 6)]
+ANIMATION_ATTACK_LEFT = [f'assets_sprites/Attack-01/attack_l{i}.png' for i in range(1, 6)]
 
 
 class Player(sprite.Sprite):
@@ -76,7 +80,19 @@ class Player(sprite.Sprite):
         self.boltAnimJumpLeft = pyganim.PygAnimation(boltAnim)
         self.boltAnimJumpLeft.play()
 
-    def update(self, left, right, up, platforms):
+        boltAnim = []
+        for anim in ANIMATION_ATTACK_RIGHT:
+            boltAnim.append((anim, 60))
+        self.boltAnimAttackRight = pyganim.PygAnimation(boltAnim)
+        self.boltAnimAttackRight.play()
+
+        boltAnim = []
+        for anim in ANIMATION_ATTACK_LEFT:
+            boltAnim.append((anim, 60))
+        self.boltAnimAttackLeft = pyganim.PygAnimation(boltAnim)
+        self.boltAnimAttackLeft.play()
+
+    def update(self, left, right, up, platforms, attack):
         if up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
                 self.yvel = -JUMP_POWER
@@ -113,6 +129,19 @@ class Player(sprite.Sprite):
                     self.boltAnimStayLeft.blit(self.image, (0, 0))
         if not self.onGround:
             self.yvel += GRAVITY
+
+        if attack:
+            self.image = Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
+            self.image.fill(Color(COLOR))
+            if self.direction is True:
+                self.boltAnimAttackRight.blit(self.image, (0, 0))
+            if self.direction is False:
+                self.boltAnimAttackLeft.blit(self.image, (0, 0))
+
+
+
+
+
 
         self.onGround = False;  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel

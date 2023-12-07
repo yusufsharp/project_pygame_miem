@@ -1,13 +1,10 @@
 import pygame as pg, pygame
 from pygame import *
 import sys
-import blocks
 from blocks import Platform
 from settings import *
 from pygame.locals import *
-import player
 from player import Player
-import pyganim
 
 pg.init()
 
@@ -40,7 +37,7 @@ for row in level:
 
 def main():
     run = True
-    left = right = up = False  # по умолчанию — стоим
+    attack = left = right = up = False  # по умолчанию — стоим
     while run:
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -49,28 +46,33 @@ def main():
             if e.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if e.type == KEYDOWN and e.key == K_LEFT:
+            if e.type == KEYDOWN and e.key == K_a:
                 left = True
-            if e.type == KEYDOWN and e.key == K_RIGHT:
+            if e.type == KEYDOWN and e.key == K_d:
                 right = True
 
-            if e.type == KEYUP and e.key == K_RIGHT:
+            if e.type == KEYUP and e.key == K_d:
                 right = False
-            if e.type == KEYUP and e.key == K_LEFT:
+            if e.type == KEYUP and e.key == K_a:
                 left = False
 
-            if e.type == KEYDOWN and e.key == K_UP:
+            if e.type == KEYDOWN and e.key == K_w:
                 up = True
 
-            if e.type == KEYUP and e.key == K_UP:
+            if e.type == KEYUP and e.key == K_w:
                 up = False
+
+            if e.type == KEYDOWN and e.key == K_SPACE:
+                attack = True
+            if e.type == KEYUP and e.key == K_SPACE:
+                attack = False
 
         bg.fill(Color(BACKGROUND_COLOR))
         screen.blit(background_image, (0, 0))
         screen.blit(overlay, (0, 0))
 
         entities.draw(screen)
-        hero.update(left, right, up, platforms)
+        hero.update(left, right, up, platforms, attack)
         entities.draw(screen)
 
         pygame.display.update()
