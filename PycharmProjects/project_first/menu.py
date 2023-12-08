@@ -3,6 +3,7 @@ from pygame import *
 import sys
 import requests
 from settings import *
+import math
 
 
 def send_post_request(username, password):
@@ -50,8 +51,7 @@ def menuFunc():
     scaled_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     screen.blit(scaled_image, (0, 0))
-    font_path = 'fonts/thin_pixel-7.ttf'
-    font = pg.font.Font(font_path, 36)
+    font = pg.font.Font('fonts/thin_pixel-7.ttf', 36)
     animate(screen, 35, 20, 30, 10, duration=200)
     login_button_rect = draw_rect(screen, 35, 20, 30, 10)
     print_text_in_bar(screen, font, 'Войти', login_button_rect, clr=(0, 0, 0))
@@ -68,6 +68,7 @@ def menuFunc():
                 if login_button_rect.collidepoint(event.pos):
                     print("Нажата кнопка 'Войти'")
                     menu_reg_func(font, screen)
+                    darken_screen(screen)
                     reg = True
                 elif register_button_rect.collidepoint(event.pos):
                     print("Нажата кнопка 'Рейтинг'")
@@ -88,7 +89,7 @@ def menu_reg_func(font, screen):
     init_window = draw_rect(screen, 45, 60, 10, 5, clr=(255, 0, 0), border_width=3)
     name_text_rect = print_text_in_bar(screen, font, "Логин: ", name_window)
     pass_text_rect = print_text_in_bar(screen, font, "Пароль: ", pass_window)
-    print_text_in_bar(screen, font, "Играть", init_window, right_pos=2, bottom_pos=-6)
+    print_text_in_bar(screen, font, "Играть", init_window, right_pos=2, bottom_pos=-6, clr=(0, 0, 0))
 
     active_name = False
     active_pass = False
@@ -116,9 +117,11 @@ def menu_reg_func(font, screen):
                     pygame.draw.rect(screen, (0, 0, 0), name_window, 2, border_radius=20)
                 elif init_window.collidepoint(event.pos):
                     if text_name != '' and text_pass != '':
+                        pygame.draw.rect(screen, (255, 255, 255), init_window)
                         animate(screen, 45, 60, 10, 5, clr=(0, 255, 0))
                         user_exists = send_get_request(text_name, text_pass)
                         if not user_exists:
+                            pygame.draw.rect(screen, (255, 255, 255), init_window)
                             animate(screen, 45, 60, 10, 5, clr=(200, 200, 200))
                             send_post_request(text_name, text_pass)
                             print('Игрок проходит регистрацию')
@@ -126,11 +129,12 @@ def menu_reg_func(font, screen):
                         else:
                             auth = register_request(text_name, text_pass)
                             if not auth:
+                                pygame.draw.rect(screen, (255, 255, 255), init_window)
                                 animate(screen, 45, 60, 10, 5, clr=(255, 0, 0))
-                                init_window = draw_rect(screen, 45, 60, 10, 5, clr=(255, 0, 0), border_width=3)
                                 error_rect = draw_rect(screen, 35, 20, 30, 10)
                                 print_text_in_bar(screen, font, 'Неверный пароль!', error_rect, clr=(255, 0, 0))
                             else:
+                                pygame.draw.rect(screen, (255, 255, 255), init_window)
                                 animate(screen, 45, 60, 10, 5, clr=pygame.Color('dodgerblue2'))
                                 print('Добро пожаловать!!!')
                                 input_active = False
@@ -142,6 +146,8 @@ def menu_reg_func(font, screen):
                     text_pass = text_bar_updating(screen, event, font, pass_window, text_pass, pass_text_rect)
 
                 if text_name != '' and text_pass != '':
+                    pygame.draw.rect(screen, (255, 255, 255), init_window, border_radius=20)
+                    print_text_in_bar(screen, font, "Играть", init_window, right_pos=2, bottom_pos=-6, clr=(0, 0, 0))
                     pygame.draw.rect(screen, (0, 255, 0), init_window, 3, border_radius=20)
         pygame.display.flip()
 
@@ -185,7 +191,7 @@ def text_bar_updating(screen, event, font, window, text, text_rect):
     return text
 
 
-def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0, duration=200):
+def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0, duration=300):
     start_time = pg.time.get_ticks()
     while True:
         elapsed_time = pg.time.get_ticks() - start_time
@@ -197,7 +203,7 @@ def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_
         window_x = (WINDOW_WIDTH * x) // 100
         window_y = (WINDOW_HEIGHT * y) // 100
 
-        window_width = int((WINDOW_WIDTH * width) / 100 * progress**(1/3))
+        window_width = int((WINDOW_WIDTH * width) / 100 * (progress ** (1 / 3)))
         window_height = (WINDOW_HEIGHT * height) // 100
         n_rect = pg.Rect(window_x, window_y, window_width, window_height)
         pygame.draw.rect(screen, clr, n_rect, border_radius=border, width=border_width)
@@ -208,3 +214,31 @@ def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_
 
         pg.time.Clock().tick(60)
         pygame.display.flip()
+
+def darken_screen(screen, duration=3000):
+    overlay = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+    overlay.fill((0, 0, 0))  # Задаем черный цвет
+    alpha = 0
+    font = pg.font.Font('fonts/thin_pixel-7.ttf', 108)
+    start_time = pg.time.get_ticks()
+
+    while alpha <= 255:
+        elapsed_time = pg.time.get_ticks() - start_time
+        if elapsed_time >= duration:
+            break
+        progress = math.sin((elapsed_time / duration) * math.pi / 2)
+        alpha = int(progress * 255)
+        overlay.set_alpha(alpha)
+        radius = progress * WINDOW_WIDTH
+        alpha = int((1 - progress) * 255)
+        screen.blit(overlay, (0, 0))  # Наложение затемненной поверхности на экран
+        pg.draw.circle(overlay, (200, 0, 0, alpha), (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), int(radius))
+        print_text_in_bar(screen, font, 'Real Hero', overlay.get_rect(), clr=(255, 255, 255, alpha))
+        pg.display.flip()
+
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+
+        pg.time.Clock().tick(60)
