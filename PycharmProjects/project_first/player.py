@@ -132,6 +132,7 @@ class Player(sprite.Sprite):
 
         if attack:
             self.image = Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
+            self.image.set_colorkey(Color(COLOR))
             self.image.fill(Color(COLOR))
             if self.direction is True:
                 self.boltAnimAttackRight.blit(self.image, (0, 0))

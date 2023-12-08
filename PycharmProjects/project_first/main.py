@@ -1,8 +1,5 @@
 import pygame
-from pygame import *
-import sys
-from blocks import Platform
-import blocks
+from enemies import *
 from blocks import *
 from settings import *
 from pygame.locals import *
@@ -41,6 +38,12 @@ for row in level:
         x += PLATFORM_WIDTH
     y += PLATFORM_HEIGHT
     x = 0
+
+monsters = pygame.sprite.Group()
+mn = Enemy(2600, 1095, 2, 0, 100, 0)
+entities.add(mn)
+platforms.append(mn)
+monsters.add(mn)
 
 
 class Camera(object):
@@ -112,6 +115,7 @@ def main():
         for e in entities:
             screen.blit(e.image, camera.apply(e))
         moving_platform.update()
+        monsters.update(platforms)
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
