@@ -49,15 +49,16 @@ def menuFunc():
     background_image = pg.image.load('images/Background.png')
     scaled_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    screen.blit(scaled_image, (0, 0))
+    font_path = 'fonts/thin_pixel-7.ttf'
+    font = pg.font.Font(font_path, 36)
+    animate(screen, 35, 20, 30, 10, duration=200)
+    login_button_rect = draw_rect(screen, 35, 20, 30, 10)
+    print_text_in_bar(screen, font, 'Войти', login_button_rect, clr=(0, 0, 0))
+    animate(screen, 35, 40, 30, 10, duration=200)
+    register_button_rect = draw_rect(screen, 35, 40, 30, 10)
+    print_text_in_bar(screen, font, 'Рейтинг', register_button_rect, clr=(0, 0, 0))
     while not reg:
-        screen.blit(scaled_image, (0, 0))
-        font_path = 'fonts/thin_pixel-7.ttf'
-        font = pg.font.Font(font_path, 36)
-
-        login_button_rect = draw_rect(screen, 35, 20, 30, 10)
-        register_button_rect = draw_rect(screen, 35, 40, 30, 10)
-        print_text_in_bar(screen, font, 'Войти', login_button_rect, clr=(0, 0, 0))
-        print_text_in_bar(screen, font, 'Рейтинг', register_button_rect, clr=(0, 0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -78,6 +79,7 @@ def menuFunc():
 
 def menu_reg_func(font, screen):
     input_active = True  # переменная которая отвечает за прогонку меню окна регистрации
+    animate(screen, 20, 20, 60, 50, clr=(255, 255, 255, 128), duration=300)
     draw_rect(screen, 20, 20, 60, 50, clr=(255, 255, 255, 128))
 
     # треба настроить прозрачность
@@ -114,17 +116,22 @@ def menu_reg_func(font, screen):
                     pygame.draw.rect(screen, (0, 0, 0), name_window, 2, border_radius=20)
                 elif init_window.collidepoint(event.pos):
                     if text_name != '' and text_pass != '':
+                        animate(screen, 45, 60, 10, 5, clr=(0, 255, 0))
                         user_exists = send_get_request(text_name, text_pass)
                         if not user_exists:
+                            animate(screen, 45, 60, 10, 5, clr=(200, 200, 200))
                             send_post_request(text_name, text_pass)
                             print('Игрок проходит регистрацию')
                             input_active = False
                         else:
                             auth = register_request(text_name, text_pass)
                             if not auth:
+                                animate(screen, 45, 60, 10, 5, clr=(255, 0, 0))
+                                init_window = draw_rect(screen, 45, 60, 10, 5, clr=(255, 0, 0), border_width=3)
                                 error_rect = draw_rect(screen, 35, 20, 30, 10)
                                 print_text_in_bar(screen, font, 'Неверный пароль!', error_rect, clr=(255, 0, 0))
                             else:
+                                animate(screen, 45, 60, 10, 5, clr=pygame.Color('dodgerblue2'))
                                 print('Добро пожаловать!!!')
                                 input_active = False
 
@@ -177,3 +184,27 @@ def text_bar_updating(screen, event, font, window, text, text_rect):
 
     return text
 
+
+def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0, duration=200):
+    start_time = pg.time.get_ticks()
+    while True:
+        elapsed_time = pg.time.get_ticks() - start_time
+        if elapsed_time >= duration:
+            break
+
+        progress = elapsed_time / duration
+
+        window_x = (WINDOW_WIDTH * x) // 100
+        window_y = (WINDOW_HEIGHT * y) // 100
+
+        window_width = int((WINDOW_WIDTH * width) / 100 * progress**(1/3))
+        window_height = (WINDOW_HEIGHT * height) // 100
+        n_rect = pg.Rect(window_x, window_y, window_width, window_height)
+        pygame.draw.rect(screen, clr, n_rect, border_radius=border, width=border_width)
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+
+        pg.time.Clock().tick(60)
+        pygame.display.flip()
