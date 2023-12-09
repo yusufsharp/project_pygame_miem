@@ -32,3 +32,20 @@ class MovingPlatform(Platform):
 
         if self.hero and self.hero.on_moving_platform:
             self.hero.rect.x += self.direction * self.speed
+
+class Lava(Platform):
+    def __init__(self, x, y, images):
+        super().__init__(x, y, images[0])
+        self.images = [image.load(image_path) for image_path in images]
+        self.image_index = 0
+        self.image = self.images[self.image_index]
+        self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
+        self.animation_speed = 0.2
+        self.animation_timer = pg.time.get_ticks()
+
+    def animate(self):
+        now = pg.time.get_ticks()
+        if now - self.animation_timer > self.animation_speed * 1000:
+            self.animation_timer = now
+            self.image_index = (self.image_index + 1) % len(self.images)
+            self.image = self.images[self.image_index]

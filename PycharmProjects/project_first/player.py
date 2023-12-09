@@ -1,7 +1,6 @@
 import sys
-
 from pygame import *
-from blocks import Platform, MovingPlatform
+from blocks import Platform, MovingPlatform, Lava
 import pyganim
 from enemies import *
 
@@ -189,5 +188,6 @@ class Player(sprite.Sprite):
 
                 if isinstance(p, MovingPlatform):
                     self.on_moving_platform = True
-                else:
-                    self.on_moving_platform = False
+                elif isinstance(p, Lava):
+                    quit()
+                    sys.exit()
