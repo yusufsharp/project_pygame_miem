@@ -4,12 +4,19 @@ import sys
 import requests
 from settings import *
 import math
+import json
 
 
 def send_post_request(username, password):
     url = "https://zxces.pythonanywhere.com/myapp/api/player_info/"
-    data = {"login": username, "password": password}
-    response = requests.post(url, data=data)
+    data = {"login": username, "password": password, "achieves": {
+        'experience': 0,
+        'health': 0,
+        'points': 0,
+        'completion_time': 0
+    }}
+    response = requests.post(url, json=data)
+    # send_patch_request(username, 'experience', 3)
     print(response.text)  # берет всю бд по адресу
 
 
@@ -44,6 +51,14 @@ def register_request(username, password):
         return False
 
 
+def send_patch_request(username, achieve_type, type_value):
+    url = f'https://zxces.pythonanywhere.com/update-achieves/{username}/{achieve_type}/{type_value}/'
+    response = requests.patch(url)
+    print(response.status_code)
+    print(response.json())
+    return
+
+
 def menuFunc():
     reg = False  # отвечает за отображение всего меню
     clock = pygame.time.Clock()  # фпс
@@ -72,6 +87,7 @@ def menuFunc():
                     reg = True
                 elif register_button_rect.collidepoint(event.pos):
                     print("Нажата кнопка 'Рейтинг'")
+                    menu_rating_func(font, screen)
         pygame.display.flip()
         clock.tick(60)
 
@@ -191,19 +207,19 @@ def text_bar_updating(screen, event, font, window, text, text_rect):
     return text
 
 
-def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0, duration=150):
+def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0, duration=250):
     start_time = pg.time.get_ticks()
     while True:
         elapsed_time = pg.time.get_ticks() - start_time
         if elapsed_time >= duration:
             break
 
-        progress = elapsed_time / duration
+        progress = (elapsed_time/duration) ** (1 / 3)  # нелинейное отображение корнем куба
 
-        window_x = (WINDOW_WIDTH * x) // 100
+        window_x = (WINDOW_WIDTH * (x + (width * (1 - progress) / 2))) // 100
         window_y = (WINDOW_HEIGHT * y) // 100
 
-        window_width = int((WINDOW_WIDTH * width) / 100 * (progress ** (1 / 3)))  # нелинейное отображение корнем куба
+        window_width = int((WINDOW_WIDTH * width) / 100 * progress)
         window_height = (WINDOW_HEIGHT * height) // 100
         n_rect = pg.Rect(window_x, window_y, window_width, window_height)
         pygame.draw.rect(screen, clr, n_rect, border_radius=border, width=border_width)
@@ -236,7 +252,7 @@ def darken_screen(screen, duration=3000):
         screen.blit(overlay, (0, 0))  # наложение затемненной поверхности на экран
         pg.draw.circle(overlay, (200, 0, 0, alpha), (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), int(radius))
         overlay_rect = overlay.get_rect()
-        print_text_in_bar(screen, font, 'Real Hero', overlay_rect, clr=(255, 255, 255))
+        print_text_in_bar(screen, font, 'Syn Eldaka', overlay_rect, clr=(255, 255, 255))
         pg.display.flip()
 
         for event in pg.event.get():
@@ -245,3 +261,12 @@ def darken_screen(screen, duration=3000):
                 sys.exit()
 
         pg.time.Clock().tick(60)
+
+
+def menu_rating_func(font, screen):
+    db_json = requests.get("https://zxces.pythonanywhere.com/api/player_info/").text
+    db = json.loads(db_json)
+    for elm in db:
+        del elm['password']
+        del elm['id']
+        print(elm)
