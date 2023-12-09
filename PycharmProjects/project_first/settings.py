@@ -1,7 +1,7 @@
 import pygame.time
 import pyganim
-WINDOW_WIDTH = 1980
-WINDOW_HEIGHT = 1080
+WINDOW_WIDTH = 1080
+WINDOW_HEIGHT = 720
 
 
 FPS = 60
