@@ -16,7 +16,7 @@ def send_post_request(username, password):
         'completion_time': 0
     }}
     response = requests.post(url, json=data)
-    # send_patch_request(username, 'experience', 3)
+    #send_patch_request(username, 'experience', 101)
     print(response.text)  # берет всю бд по адресу
 
 
@@ -73,6 +73,8 @@ def menuFunc():
     animate(screen, 35, 40, 30, 10)  # анимация появления рейтинг
     register_button_rect = draw_rect(screen, 35, 40, 30, 10)
     print_text_in_bar(screen, font, 'Рейтинг', register_button_rect, clr=(0, 0, 0))
+
+    login_rating_active = False
     while not reg:
         # главный цикл отображает запускает все остальное
         for event in pygame.event.get():
@@ -80,14 +82,16 @@ def menuFunc():
                 pygame.quit()
                 sys.exit()
             elif event.type == pg.MOUSEBUTTONDOWN:
-                if login_button_rect.collidepoint(event.pos):
+                if login_button_rect.collidepoint(event.pos) and not login_rating_active:
+                    login_rating_active = True
                     print("Нажата кнопка 'Войти'")
                     menu_reg_func(font, screen)
                     darken_screen(screen)
                     reg = True
-                elif register_button_rect.collidepoint(event.pos):
+                elif register_button_rect.collidepoint(event.pos) and not login_rating_active:
+                    login_rating_active = True
                     print("Нажата кнопка 'Рейтинг'")
-                    menu_rating_func(font, screen)
+                    menu_rating_func(font, screen, clock)
         pygame.display.flip()
         clock.tick(60)
 
@@ -214,7 +218,7 @@ def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_
         if elapsed_time >= duration:
             break
 
-        progress = (elapsed_time/duration) ** (1 / 3)  # нелинейное отображение корнем куба
+        progress = (elapsed_time / duration) ** (1 / 3)  # нелинейное отображение корнем куба
 
         window_x = (WINDOW_WIDTH * (x + (width * (1 - progress) / 2))) // 100
         window_y = (WINDOW_HEIGHT * y) // 100
@@ -252,7 +256,7 @@ def darken_screen(screen, duration=3000):
         screen.blit(overlay, (0, 0))  # наложение затемненной поверхности на экран
         pg.draw.circle(overlay, (200, 0, 0, alpha), (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), int(radius))
         overlay_rect = overlay.get_rect()
-        print_text_in_bar(screen, font, 'Syn Eldaka', overlay_rect, clr=(255, 255, 255))
+        print_text_in_bar(screen, font, 'Real Hero', overlay_rect, clr=(255, 255, 255))
         pg.display.flip()
 
         for event in pg.event.get():
@@ -263,10 +267,49 @@ def darken_screen(screen, duration=3000):
         pg.time.Clock().tick(60)
 
 
-def menu_rating_func(font, screen):
+def menu_rating_func(font, screen, clock):
+    screen.fill((255, 255, 255))
     db_json = requests.get("https://zxces.pythonanywhere.com/api/player_info/").text
     db = json.loads(db_json)
+    menu_rating = True
+
     for elm in db:
         del elm['password']
-        del elm['id']
-        print(elm)
+        del elm['achieves']['id']
+    scroll = 0
+    anima = True
+    while menu_rating:
+
+        screen.fill((255, 255, 255))
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_UP:
+                    scroll -= 1
+                elif event.key == K_DOWN:
+                    scroll += 1
+        scroll = abs(scroll % len(db))
+        headers = ['Name', 'Experience', 'Health', 'Points', 'Speedrun']
+        i = 25
+        for elm in headers:
+            cell_achieve = draw_rect(screen, i, 10, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
+            print_text_in_bar(screen, font, elm, cell_achieve, clr=pygame.Color('dodgerblue2'))
+            i += 10
+
+        j = 20
+        for k in range(scroll, len(db)):
+            i = 25
+            cell_login = draw_rect(screen, i, j, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
+            print_text_in_bar(screen, font, db[k]['login'], cell_login, clr=(0, 0, 0))
+            i += 10
+            for achieve in db[k]['achieves'].values():
+                if anima and k < 12:
+                    animate(screen, i, j, 10, 5, clr=(0, 0, 0), border=5, border_width=2, duration=5)
+                cell_achieve = draw_rect(screen, i, j, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
+                print_text_in_bar(screen, font, achieve, cell_achieve, clr=(0, 0, 0))
+                i += 10
+            j += 6
+        anima = False
+        pygame.display.flip()
