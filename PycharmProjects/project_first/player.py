@@ -1,5 +1,6 @@
 from pygame import *
 import pyganim
+import enemies
 
 MOVE_SPEED = 7
 ATTACK_WIDTH = 84
@@ -146,9 +147,19 @@ class Player(sprite.Sprite):
         self.rect.x += self.xvel  # переносим свои положение на xvel
         self.collide(self.xvel, 0, platforms)
 
+    def die(self):
+        time.wait(500)
+        self.teleporting(self.startX, self.startY)
+
+    def teleporting(self, goX, goY):
+        self.rect.x = goX
+        self.rect.y = goY
+
     def collide(self, xvel, yvel, platforms):
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
+                if isinstance(p, enemies.Enemy):
+                    self.die()
 
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо

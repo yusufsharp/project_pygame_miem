@@ -68,7 +68,7 @@ def camera_configure(camera, target_rect):
 
 def main():
     run = True
-    reg = True
+    reg = False
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(level[0]) * PLATFORM_WIDTH
     total_level_height = len(level[0]) * PLATFORM_HEIGHT
