@@ -1,6 +1,8 @@
+import sys
+
 from pygame import *
 import pyganim
-import enemies
+from enemies import *
 
 MOVE_SPEED = 7
 ATTACK_WIDTH = 84
@@ -20,6 +22,8 @@ ANIMATION_STAY_LEFT = [f"assets_sprites/idle/Idle_l{i}.png" for i in range(4)]
 ANIMATION_STAY_RIGHT = [f"assets_sprites/idle/Idle_r{i}.png" for i in range(5)]
 ANIMATION_ATTACK_RIGHT = [f'assets_sprites/Attack-01/attack_r{i}.png' for i in range(1, 6)]
 ANIMATION_ATTACK_LEFT = [f'assets_sprites/Attack-01/attack_l{i}.png' for i in range(1, 6)]
+
+enemy = Enemy
 
 
 class Player(sprite.Sprite):
@@ -142,24 +146,26 @@ class Player(sprite.Sprite):
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms)
+        self.collide(0, self.yvel, platforms, attack)
 
         self.rect.x += self.xvel  # переносим свои положение на xvel
-        self.collide(self.xvel, 0, platforms)
+        self.collide(self.xvel, 0, platforms, attack)
 
     def die(self):
-        time.wait(500)
-        self.teleporting(self.startX, self.startY)
+        sys.exit()
 
     def teleporting(self, goX, goY):
         self.rect.x = goX
         self.rect.y = goY
 
-    def collide(self, xvel, yvel, platforms):
+    def collide(self, xvel, yvel, platforms, attack):
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
-                if isinstance(p, enemies.Enemy):
-                    self.die()
+                if isinstance(p, Enemy):
+                    if attack:
+                        p.kill()
+                    else:
+                        self.die()
 
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо

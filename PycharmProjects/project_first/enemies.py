@@ -47,3 +47,6 @@ class Enemy(sprite.Sprite):
             if sprite.collide_rect(self, p) and self != p:
                 self.xvel = - self.xvel
                 self.yvel = - self.yvel
+
+    def die(self):
+        self.kill()

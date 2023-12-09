@@ -68,7 +68,7 @@ def camera_configure(camera, target_rect):
 
 def main():
     run = True
-    reg = False
+    reg = True
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(level[0]) * PLATFORM_WIDTH
     total_level_height = len(level[0]) * PLATFORM_HEIGHT
@@ -115,6 +115,7 @@ def main():
         for e in entities:
             screen.blit(e.image, camera.apply(e))
         moving_platform.update()
+
         monsters.update(platforms)
 
         pygame.display.update()
