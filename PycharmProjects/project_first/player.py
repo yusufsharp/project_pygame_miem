@@ -167,6 +167,7 @@ class Player(sprite.Sprite):
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
                     if attack:
+                        platforms.remove(p)
                         p.kill()
                     else:
                         self.die()
