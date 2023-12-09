@@ -24,9 +24,10 @@ pygame.display.set_icon(icon)
 entities = pygame.sprite.Group()
 platforms = []  # создаем героя по (x,y) координатам
 
-hero = Player(2064, 100)  # создаем героя по (x,y) координатам
+hero = Player(1064, 2000)  # создаем героя по (x,y) координатам
 
-moving_platform = MovingPlatform(2064, 500, IMGS_PLATFORM['^'], 2064, 2304, 3)
+moving_platform = MovingPlatform(2064, 900, IMGS_PLATFORM['^'], 2064, 2904, 3)
+moving_platform.set_hero(hero)
 entities.add(hero, moving_platform)
 platforms.append(moving_platform)
 

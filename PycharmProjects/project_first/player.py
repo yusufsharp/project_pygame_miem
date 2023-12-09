@@ -1,4 +1,5 @@
 from pygame import *
+from blocks import Platform, MovingPlatform
 import pyganim
 
 MOVE_SPEED = 7
@@ -36,6 +37,7 @@ class Player(sprite.Sprite):
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
 
         self.direction = True
+        self.on_moving_platform = False
 
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
         #        Анимация движения вправо
@@ -101,6 +103,8 @@ class Player(sprite.Sprite):
                 self.boltAnimJumpRight.blit(self.image, (0, 0))
             else:
                 self.boltAnimJumpLeft.blit(self.image, (0, 0))
+
+            self.on_moving_platform = False
         if left:
             self.direction = False
             self.xvel = -MOVE_SPEED  # Лево = x- n
@@ -133,6 +137,7 @@ class Player(sprite.Sprite):
         if attack:
             self.image = Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
             self.image.fill(Color(COLOR))
+            self.image.set_colorkey(Color(COLOR))
             if self.direction is True:
                 self.boltAnimAttackRight.blit(self.image, (0, 0))
             if self.direction is False:
@@ -140,12 +145,12 @@ class Player(sprite.Sprite):
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms)
+        self.collide(0, self.yvel, platforms, self.on_moving_platform)
 
         self.rect.x += self.xvel  # переносим свои положение на xvel
-        self.collide(self.xvel, 0, platforms)
 
-    def collide(self, xvel, yvel, platforms):
+
+    def collide(self, xvel, yvel, platforms, on_moving_platform):
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
 
@@ -163,3 +168,8 @@ class Player(sprite.Sprite):
                 if yvel < 0:  # если движется вверх
                     self.rect.top = p.rect.bottom  # то не движется вверх
                     self.yvel = 0  # и энергия прыжка пропадает
+
+                if isinstance(p, MovingPlatform):
+                    self.on_moving_platform = True
+                else:
+                    self.on_moving_platform = False

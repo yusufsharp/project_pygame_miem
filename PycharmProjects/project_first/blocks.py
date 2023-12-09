@@ -14,13 +14,21 @@ class MovingPlatform(Platform):
     def __init__(self, x, y, image_path, start_x, end_x, speed):
         super().__init__(x, y, image_path)
         self.image = pg.transform.scale(self.image, (200, 32))
+        self.rect = Rect(x, y, 200, 32)
         self.start_x = start_x
         self.end_x = end_x
         self.speed = speed
         self.direction = 1 #1 - right, -1 - left
+        self.hero = None
+
+    def set_hero(self, hero):
+        self.hero = hero
 
     def update(self):
         self.rect.x += self.direction * self.speed
 
         if self.rect.right > self.end_x or self.rect.left < self.start_x:
             self.direction *= -1
+
+        if self.hero and self.hero.on_moving_platform:
+            self.hero.rect.x += self.direction * self.speed
