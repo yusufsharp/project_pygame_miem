@@ -26,6 +26,10 @@ IMGS_PLATFORM = {
     '^': 'images/blocks/transform_platform.png' #двигающаяся платформа
 }
 
+lava_images = ['images/lava/lava1.png',
+               'images/lava/lava2.png',
+               'images/lava/lava3.png',
+               'images/lava/lava4.png']
 
 
 level = [
@@ -107,6 +111,8 @@ level = [
     '/                                                                                                                                                      \\',
     '/                                                                                                                                                      \\',
     '/                                                                                                                                                      \\',
+    '/                                                                                                                                                      \\',
+    '/LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL    \\',
     '/                                                                                                                                                      \\',
     '________________________________________________________________________________________________________________________________________________________',
 ]

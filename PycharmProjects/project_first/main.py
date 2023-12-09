@@ -35,10 +35,14 @@ x = y = 0
 
 for row in level:
     for col in row:
-        if col != ' ':
+        if col != ' ' and col != 'L':
             pf = Platform(x, y, IMGS_PLATFORM[col])
             entities.add(pf)
             platforms.append(pf)
+        elif col == 'L':
+            lava = Lava(x, y, lava_images)
+            entities.add(lava)
+            platforms.append(lava)
         x += PLATFORM_WIDTH
     y += PLATFORM_HEIGHT
     x = 0
@@ -111,6 +115,9 @@ def main():
 
         camera.update(hero)
         for e in entities:
+            if isinstance(e, Lava):
+                e.animate()
+
             screen.blit(e.image, camera.apply(e))
         moving_platform.update()
 
