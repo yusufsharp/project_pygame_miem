@@ -197,7 +197,6 @@ class Player(sprite.Sprite):
                         self.health_bar.hp -= damage
                         if self.health_bar.hp <= 0:
                             self.die()
-
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
 
@@ -241,7 +240,7 @@ class AttackEffect(sprite.Sprite):
         self.rect.centerx = self.player.rect.centerx
         self.rect.centery = self.player.rect.centery
 
-    def update(self, attack):
+    def update(self, attack, platforms):
         if attack:
             if self.player.direction:
                 self.rect.centerx = self.player.rect.centerx + 64
@@ -254,6 +253,22 @@ class AttackEffect(sprite.Sprite):
         else:
             self.rect.centerx = -1000
             self.rect.centery = -1000
+
+        self.collide(platforms, attack)
+
+    def collide(self, platforms, attack):
+        for p in platforms:
+            if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
+                if isinstance(p, Enemy):
+                    if attack:
+                        platforms.remove(p)
+                        p.kill()
+                    else:
+                        damage = 2
+                        self.health_bar.hp -= damage
+                        if self.health_bar.hp <= 0:
+                            self.die()
+
 
     def draw(self, attack, surface):
         if attack:

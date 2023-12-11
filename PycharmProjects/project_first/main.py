@@ -89,7 +89,7 @@ def main():
     camera = Camera(camera_configure, total_level_width, total_level_height)
     while run:
 
-        attack_effect.update(attack)
+        attack_effect.update(attack, platforms)
 
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
