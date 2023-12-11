@@ -3,6 +3,7 @@ from pygame import *
 from blocks import Platform, MovingPlatform, Lava
 import pyganim
 from enemies import *
+import pygame
 
 MOVE_SPEED = 7
 ATTACK_WIDTH = 84
@@ -26,6 +27,24 @@ ANIMATION_ATTACK_LEFT = [f'assets_sprites/Attack-01/attack_l{i}.png' for i in ra
 enemy = Enemy
 
 
+# ... (existing code)
+
+class HealthBar():
+    def __init__(self, x, y, w, h, max_hp):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.hp = max_hp
+        self.max_hp = max_hp
+
+    def draw(self, surface):
+        # Calculate health ratio
+        ratio = self.hp / self.max_hp
+        pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h))
+        pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h))
+
+
 class Player(sprite.Sprite):
     def __init__(self, x, y):
         sprite.Sprite.__init__(self)
@@ -42,6 +61,8 @@ class Player(sprite.Sprite):
 
         self.direction = True
         self.on_moving_platform = False
+
+        self.health_bar = HealthBar(x - 900, y - 1950, 128, 10, max_hp=100)
 
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
         #        Анимация движения вправо
@@ -97,6 +118,9 @@ class Player(sprite.Sprite):
             boltAnim.append((anim, 60))
         self.boltAnimAttackLeft = pyganim.PygAnimation(boltAnim)
         self.boltAnimAttackLeft.play()
+
+    def draw_health_bar(self, surface):
+        self.health_bar.draw(surface)
 
     def update(self, left, right, up, platforms, attack):
         if up:
@@ -169,7 +193,11 @@ class Player(sprite.Sprite):
                         platforms.remove(p)
                         p.kill()
                     else:
-                        self.die()
+                        # Subtract health when colliding with an enemy without attacking
+                        damage = 2  # Adjust the amount of damage as needed
+                        self.health_bar.hp -= damage
+                        if self.health_bar.hp <= 0:
+                            self.die()
 
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо

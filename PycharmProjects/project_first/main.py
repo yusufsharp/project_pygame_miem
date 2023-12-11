@@ -46,9 +46,15 @@ for row in level:
 
 monsters = pygame.sprite.Group()
 mn = Enemy(2600, 1095, 2, 0, 100, 0)
+mn2 = Enemy(2300, 1095, 2, 0, 100, 0)
+golem1 = Enemy2(2000, 1250, 1, 0, 100, 0)
 entities.add(mn)
+entities.add(mn2)
+entities.add(golem1)
 platforms.append(mn)
-monsters.add(mn)
+platforms.append(mn2)
+platforms.append(golem1)
+monsters.add(mn, mn2, golem1)
 
 
 class Camera(object):
@@ -125,6 +131,8 @@ def main():
         moving_platform.update()
 
         monsters.update(platforms)
+
+        hero.draw_health_bar(screen)
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)

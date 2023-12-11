@@ -1,8 +1,8 @@
 import pygame.time
 import pyganim
-WINDOW_WIDTH = 1080
-WINDOW_HEIGHT = 720
 
+WINDOW_WIDTH = 1920
+WINDOW_HEIGHT = 1080
 
 FPS = 60
 FPS_CLOCK = pygame.time.Clock()
@@ -23,14 +23,13 @@ IMGS_PLATFORM = {
     '4': 'images/blocks/IndustrialTile_51.png',  # левый нижний угол
     '*': "images/blocks/IndustrialTile_68.png",  # сводка
     '&': 'images/blocks/IndustrialTile_52.png',  # платформа от стены
-    '^': 'images/blocks/transform_platform.png' #двигающаяся платформа
+    '^': 'images/blocks/transform_platform.png'  # двигающаяся платформа
 }
 
 lava_images = ['images/lava/lava1.png',
                'images/lava/lava2.png',
                'images/lava/lava3.png',
                'images/lava/lava4.png']
-
 
 level = [
     '-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------',
@@ -116,4 +115,3 @@ level = [
     '/                                                                                                                                                      \\',
     '________________________________________________________________________________________________________________________________________________________',
 ]
-
