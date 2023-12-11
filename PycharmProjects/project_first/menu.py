@@ -5,6 +5,7 @@ import requests
 from settings import *
 import math
 import json
+import random
 
 
 def send_post_request(username, password):
@@ -17,12 +18,15 @@ def send_post_request(username, password):
     }}
     response = requests.post(url, json=data)
     print(response.text)  # берет всю бд по адресу
+    return username
 
 
 def send_get_request(username, password):
     url = f"https://zxces.pythonanywhere.com/api/player_info/{username}"
     params = {"login": username, "password": password}
+    # start_time = pg.time.get_ticks()
     response = requests.get(url, params=params)
+    # print('Время:', pg.time.get_ticks()-start_time)
     if response.status_code == 200:
         player_info = response.json()
         print("Игрок найден. Информация о игроке:", player_info)
@@ -44,8 +48,8 @@ def register_request(username, password):
         player_info = response.json()
         print("Игрок зарегестрирован", player_info)
         print(response.text)
-        #send_patch_request(username, 'experience', 101)
-        return True
+        # send_patch_request(username, 'experience', 101)
+        return True, username
     else:
         print(f"Неверный пароль: {response.status_code}, {response.text}")
         return False
@@ -62,6 +66,7 @@ def send_patch_request(username, achieve_type, type_value, secure_key=SECURE_KEY
 
 def menuFunc():
     reg = False  # отвечает за отображение всего меню
+    username = 'АНОНИМУС'
     clock = pygame.time.Clock()  # фпс
     background_image = pg.image.load('images/Background.png')
     scaled_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))  # подгоняем изображение
@@ -86,7 +91,7 @@ def menuFunc():
                 if login_button_rect.collidepoint(event.pos) and not login_rating_active:
                     login_rating_active = True
                     print("Нажата кнопка 'Войти'")
-                    menu_reg_func(font, screen)
+                    username = menu_reg_func(font, screen, username)
                     darken_screen(screen)
                     reg = True
                 elif register_button_rect.collidepoint(event.pos) and not login_rating_active:
@@ -96,10 +101,10 @@ def menuFunc():
         pygame.display.flip()
         clock.tick(60)
 
-    return reg
+    return reg, username
 
 
-def menu_reg_func(font, screen):
+def menu_reg_func(font, screen, username):
     input_active = True  # переменная которая отвечает за прогонку меню окна регистрации
     animate(screen, 20, 20, 60, 50, clr=(255, 255, 255, 128), duration=300)
     draw_rect(screen, 20, 20, 60, 50, clr=(255, 255, 255, 128))
@@ -144,11 +149,11 @@ def menu_reg_func(font, screen):
                         if not user_exists:
                             pygame.draw.rect(screen, (255, 255, 255), init_window)  # отбеливание батона
                             animate(screen, 45, 60, 10, 5, clr=(200, 200, 200))  # серый батон загрузки
-                            send_post_request(text_name, text_pass)  # передает данные для реги
+                            username = send_post_request(text_name, text_pass)  # передает данные для реги
                             print('Игрок проходит регистрацию')
                             input_active = False  # закончили арку меню
                         else:
-                            auth = register_request(text_name, text_pass)  # проверка пароля
+                            auth, username = register_request(text_name, text_pass)  # проверка пароля
                             if not auth:
                                 pygame.draw.rect(screen, (255, 255, 255), init_window)  # отбеливание батона
                                 animate(screen, 45, 60, 10, 5, clr=(255, 0, 0))  # красный батон загрузки
@@ -171,6 +176,7 @@ def menu_reg_func(font, screen):
                     print_text_in_bar(screen, font, "Играть", init_window, right_pos=2, bottom_pos=-6, clr=(0, 0, 0))
                     pygame.draw.rect(screen, (0, 255, 0), init_window, 3, border_radius=20)
         pygame.display.flip()
+    return username
 
 
 def draw_rect(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0):
@@ -314,3 +320,50 @@ def menu_rating_func(font, screen, clock):
             j += 6
         anima = False
         pygame.display.flip()
+
+
+def death_screen(screen):
+    font = pg.font.Font('fonts/thin_pixel-7.ttf', 320)
+    original_image = pygame.image.load("images/blood.png")
+    image_rect = original_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+    duration = 500
+    start_time = pg.time.get_ticks()
+    respawn_rect = draw_rect(screen, 30, 70, 40, 10, clr=(255, 0, 0), border_width=8)
+    # Главный цикл игры
+    while True:
+        elapsed_time = pg.time.get_ticks() - start_time
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        if elapsed_time < duration:
+            progress = 3 - 2.5 * (elapsed_time / duration) ** (1 / 5)
+            # Уменьшение размера изображения
+            scaled_image = pygame.transform.scale(original_image, (
+                int(image_rect.width * progress), int(image_rect.height * progress)))
+            screen.fill((0, 0, 0))
+            screen.blit(scaled_image, scaled_image.get_rect(center=image_rect.center))
+        else:
+            scaled_image = pygame.transform.scale(original_image, (
+                int(image_rect.width * 0.5), int(image_rect.height * 0.5)))
+            screen.fill((0, 0, 0))
+            screen.blit(scaled_image, scaled_image.get_rect(center=((WINDOW_WIDTH + random.randint(-50, 50)) // 2,
+                                                                    (WINDOW_HEIGHT + random.randint(-50, 50)) // 2)))
+            print_text_in_bar(screen, font, "ТЫ МЕРТВ",
+                              screen.get_rect(center=((WINDOW_WIDTH + random.randint(-10, 10)) // 2,
+                                                      (WINDOW_HEIGHT + random.randint(-10, 10)) // 2)),
+                              clr=(200, 200, 200))
+
+            draw_rect(screen, 30, 70, 40, 10, clr=(255, 0, 0), border_width=8)
+            print_text_in_bar(screen, pg.font.Font('fonts/thin_pixel-7.ttf', 60),
+                              'Возродиться', respawn_rect, bottom_pos=-5)
+            for event in pygame.event.get():
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if respawn_rect.collidepoint(event.pos):
+                        # какая то функция...
+                        pygame.quit()
+                        sys.exit()
+
+
+        pygame.display.flip()
+        pygame.time.Clock().tick(60)
