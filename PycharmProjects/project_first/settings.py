@@ -2,6 +2,7 @@ import pygame.time
 import pyganim
 WINDOW_WIDTH = 1080
 WINDOW_HEIGHT = 720
+SECURE_KEY = "f@?2R{yPCZuI2!u(iE!4$Z&(}.sd;G9e4*<kd{D8ltAfs9HNqIR*0w=^#yG^):{?"
 
 
 FPS = 60

@@ -16,7 +16,6 @@ def send_post_request(username, password):
         'completion_time': 0
     }}
     response = requests.post(url, json=data)
-    #send_patch_request(username, 'experience', 101)
     print(response.text)  # берет всю бд по адресу
 
 
@@ -45,15 +44,17 @@ def register_request(username, password):
         player_info = response.json()
         print("Игрок зарегестрирован", player_info)
         print(response.text)
+        #send_patch_request(username, 'experience', 101)
         return True
-    elif response.status_code == 401:
+    else:
         print(f"Неверный пароль: {response.status_code}, {response.text}")
         return False
 
 
-def send_patch_request(username, achieve_type, type_value):
+def send_patch_request(username, achieve_type, type_value, secure_key=SECURE_KEY):
     url = f'https://zxces.pythonanywhere.com/update-achieves/{username}/{achieve_type}/{type_value}/'
-    response = requests.patch(url)
+    params = {'key': secure_key}
+    response = requests.patch(url, params=params)
     print(response.status_code)
     print(response.json())
     return
@@ -256,7 +257,7 @@ def darken_screen(screen, duration=3000):
         screen.blit(overlay, (0, 0))  # наложение затемненной поверхности на экран
         pg.draw.circle(overlay, (200, 0, 0, alpha), (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), int(radius))
         overlay_rect = overlay.get_rect()
-        print_text_in_bar(screen, font, 'Real Hero', overlay_rect, clr=(255, 255, 255))
+        print_text_in_bar(screen, font, "Buhs' Hero", overlay_rect, clr=(255, 255, 255))
         pg.display.flip()
 
         for event in pg.event.get():
