@@ -3,7 +3,7 @@ from enemies import *
 from blocks import *
 from settings import *
 from pygame.locals import *
-from player import Player
+from player import Player, AttackEffect
 from menu import menuFunc
 
 pg.init()
@@ -22,6 +22,8 @@ entities = pygame.sprite.Group()
 platforms = []  # создаем героя по (x,y) координатам
 
 hero = Player(1064, 2000)  # создаем героя по (x,y) координатам
+attack_effect = AttackEffect(hero)
+entities.add(attack_effect)
 
 moving_platform = MovingPlatform(2064, 900, IMGS_PLATFORM['^'], 2064, 2904, 3)
 moving_platform.set_hero(hero)
@@ -86,6 +88,9 @@ def main():
 
     camera = Camera(camera_configure, total_level_width, total_level_height)
     while run:
+
+        attack_effect.update(attack)
+
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         if not reg:
@@ -121,6 +126,7 @@ def main():
         screen.blit(overlay, (0, 0))
 
         hero.update(left, right, up, platforms, attack)
+        attack_effect.draw(attack, screen)
 
         camera.update(hero)
         for e in entities:

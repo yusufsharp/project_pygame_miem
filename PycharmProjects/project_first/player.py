@@ -143,6 +143,7 @@ class Player(sprite.Sprite):
                 self.boltAnimLeft.blit(self.image, (0, 0))
 
         if right:
+
             self.direction = True
             self.xvel = MOVE_SPEED  # Право = x + n
             self.image.fill(Color(COLOR))
@@ -164,7 +165,6 @@ class Player(sprite.Sprite):
 
         if attack:
             self.image = Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
-            self.image.set_colorkey(Color(COLOR))
             self.image.fill(Color(COLOR))
             self.image.set_colorkey(Color(COLOR))
             if self.direction is True:
@@ -193,8 +193,7 @@ class Player(sprite.Sprite):
                         platforms.remove(p)
                         p.kill()
                     else:
-                        # Subtract health when colliding with an enemy without attacking
-                        damage = 2  # Adjust the amount of damage as needed
+                        damage = 2
                         self.health_bar.hp -= damage
                         if self.health_bar.hp <= 0:
                             self.die()
@@ -219,3 +218,43 @@ class Player(sprite.Sprite):
                 elif isinstance(p, Lava):
                     quit()
                     sys.exit()
+
+
+class AttackEffect(sprite.Sprite):
+    def __init__(self, player):
+        super().__init__()
+
+        self.player = player
+        self.image = Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
+        self.image.set_colorkey(Color(COLOR))
+        self.rect = self.image.get_rect()
+
+        ANIMATION_ATTACK = [f"assets_sprites/attack/NPT10{i}.png" for i in range(4)]
+
+        boltAnim = []
+        for anim in ANIMATION_ATTACK:
+            boltAnim.append((anim, 60))
+        self.boltAnimAttack = pyganim.PygAnimation(boltAnim)
+        self.boltAnimAttack.play()
+
+        # Установите начальные координаты эффекта атаки относительно игрока
+        self.rect.centerx = self.player.rect.centerx
+        self.rect.centery = self.player.rect.centery
+
+    def update(self, attack):
+        if attack:
+            if self.player.direction:
+                self.rect.centerx = self.player.rect.centerx + 64
+                self.rect.centery = self.player.rect.centery
+            else:
+                self.rect.centerx = self.player.rect.centerx - 64
+                self.rect.centery = self.player.rect.centery
+            self.image.fill(Color(COLOR))
+            self.boltAnimAttack.blit(self.image, (0, 0))
+        else:
+            self.rect.centerx = -1000
+            self.rect.centery = -1000
+
+    def draw(self, attack, surface):
+        if attack:
+            surface.blit(self.image, self.rect.topleft)
