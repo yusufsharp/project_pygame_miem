@@ -251,8 +251,8 @@ class AttackEffect(sprite.Sprite):
             self.image.fill(Color(COLOR))
             self.boltAnimAttack.blit(self.image, (0, 0))
         else:
-            self.rect.centerx = -1000
-            self.rect.centery = -1000
+            self.rect.centerx = -10000
+            self.rect.centery = -10000
 
         self.collide(platforms, attack)
 
@@ -268,7 +268,6 @@ class AttackEffect(sprite.Sprite):
                         self.health_bar.hp -= damage
                         if self.health_bar.hp <= 0:
                             self.die()
-
 
     def draw(self, attack, surface):
         if attack:

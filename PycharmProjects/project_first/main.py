@@ -49,7 +49,7 @@ for row in level:
 monsters = pygame.sprite.Group()
 mn = Enemy(2600, 1095, 2, 0, 100, 0)
 mn2 = Enemy(2300, 1095, 2, 0, 100, 0)
-golem1 = Enemy2(2000, 1250, 1, 0, 100, 0)
+golem1 = Enemy2(2000, 1888, 1, 0, 200, 0, hero)
 entities.add(mn)
 entities.add(mn2)
 entities.add(golem1)
@@ -126,7 +126,6 @@ def main():
         screen.blit(overlay, (0, 0))
 
         hero.update(left, right, up, platforms, attack)
-        attack_effect.draw(attack, screen)
 
         camera.update(hero)
         for e in entities:
