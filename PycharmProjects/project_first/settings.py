@@ -1,5 +1,6 @@
 import pygame.time
 import pyganim
+SECURE_KEY = "f@?2R{yPCZuI2!u(iE!4$Z&(}.sd;G9e4*<kd{D8ltAfs9HNqIR*0w=^#yG^):{?"
 
 WINDOW_WIDTH = 1920
 WINDOW_HEIGHT = 1080

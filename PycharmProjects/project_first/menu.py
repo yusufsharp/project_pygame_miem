@@ -4,19 +4,29 @@ import sys
 import requests
 from settings import *
 import math
+import json
+import random
 
 
 def send_post_request(username, password):
     url = "https://zxces.pythonanywhere.com/myapp/api/player_info/"
-    data = {"login": username, "password": password}
-    response = requests.post(url, data=data)
+    data = {"login": username, "password": password, "achieves": {
+        'experience': 0,
+        'health': 0,
+        'points': 0,
+        'completion_time': 0
+    }}
+    response = requests.post(url, json=data)
     print(response.text)  # берет всю бд по адресу
+    return username
 
 
 def send_get_request(username, password):
     url = f"https://zxces.pythonanywhere.com/api/player_info/{username}"
     params = {"login": username, "password": password}
+    # start_time = pg.time.get_ticks()
     response = requests.get(url, params=params)
+    # print('Время:', pg.time.get_ticks()-start_time)
     if response.status_code == 200:
         player_info = response.json()
         print("Игрок найден. Информация о игроке:", player_info)
@@ -38,14 +48,25 @@ def register_request(username, password):
         player_info = response.json()
         print("Игрок зарегестрирован", player_info)
         print(response.text)
-        return True
-    elif response.status_code == 401:
+        # send_patch_request(username, 'experience', 101)
+        return True, username
+    else:
         print(f"Неверный пароль: {response.status_code}, {response.text}")
         return False
 
 
+def send_patch_request(username, achieve_type, type_value, secure_key=SECURE_KEY):
+    url = f'https://zxces.pythonanywhere.com/update-achieves/{username}/{achieve_type}/{type_value}/'
+    params = {'key': secure_key}
+    response = requests.patch(url, params=params)
+    print(response.status_code)
+    print(response.json())
+    return
+
+
 def menuFunc():
     reg = False  # отвечает за отображение всего меню
+    username = 'АНОНИМУС'
     clock = pygame.time.Clock()  # фпс
     background_image = pg.image.load('images/Background.png')
     scaled_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))  # подгоняем изображение
@@ -58,6 +79,8 @@ def menuFunc():
     animate(screen, 35, 40, 30, 10)  # анимация появления рейтинг
     register_button_rect = draw_rect(screen, 35, 40, 30, 10)
     print_text_in_bar(screen, font, 'Рейтинг', register_button_rect, clr=(0, 0, 0))
+
+    login_rating_active = False
     while not reg:
         # главный цикл отображает запускает все остальное
         for event in pygame.event.get():
@@ -65,20 +88,23 @@ def menuFunc():
                 pygame.quit()
                 sys.exit()
             elif event.type == pg.MOUSEBUTTONDOWN:
-                if login_button_rect.collidepoint(event.pos):
+                if login_button_rect.collidepoint(event.pos) and not login_rating_active:
+                    login_rating_active = True
                     print("Нажата кнопка 'Войти'")
-                    menu_reg_func(font, screen)
+                    username = menu_reg_func(font, screen, username)
                     darken_screen(screen)
                     reg = True
-                elif register_button_rect.collidepoint(event.pos):
+                elif register_button_rect.collidepoint(event.pos) and not login_rating_active:
+                    login_rating_active = True
                     print("Нажата кнопка 'Рейтинг'")
+                    menu_rating_func(font, screen, clock)
         pygame.display.flip()
         clock.tick(60)
 
-    return reg
+    return reg, username
 
 
-def menu_reg_func(font, screen):
+def menu_reg_func(font, screen, username):
     input_active = True  # переменная которая отвечает за прогонку меню окна регистрации
     animate(screen, 20, 20, 60, 50, clr=(255, 255, 255, 128), duration=300)
     draw_rect(screen, 20, 20, 60, 50, clr=(255, 255, 255, 128))
@@ -123,11 +149,11 @@ def menu_reg_func(font, screen):
                         if not user_exists:
                             pygame.draw.rect(screen, (255, 255, 255), init_window)  # отбеливание батона
                             animate(screen, 45, 60, 10, 5, clr=(200, 200, 200))  # серый батон загрузки
-                            send_post_request(text_name, text_pass)  # передает данные для реги
+                            username = send_post_request(text_name, text_pass)  # передает данные для реги
                             print('Игрок проходит регистрацию')
                             input_active = False  # закончили арку меню
                         else:
-                            auth = register_request(text_name, text_pass)  # проверка пароля
+                            auth, username = register_request(text_name, text_pass)  # проверка пароля
                             if not auth:
                                 pygame.draw.rect(screen, (255, 255, 255), init_window)  # отбеливание батона
                                 animate(screen, 45, 60, 10, 5, clr=(255, 0, 0))  # красный батон загрузки
@@ -150,6 +176,7 @@ def menu_reg_func(font, screen):
                     print_text_in_bar(screen, font, "Играть", init_window, right_pos=2, bottom_pos=-6, clr=(0, 0, 0))
                     pygame.draw.rect(screen, (0, 255, 0), init_window, 3, border_radius=20)
         pygame.display.flip()
+    return username
 
 
 def draw_rect(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0):
@@ -191,19 +218,19 @@ def text_bar_updating(screen, event, font, window, text, text_rect):
     return text
 
 
-def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0, duration=150):
+def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0, duration=250):
     start_time = pg.time.get_ticks()
     while True:
         elapsed_time = pg.time.get_ticks() - start_time
         if elapsed_time >= duration:
             break
 
-        progress = elapsed_time / duration
+        progress = (elapsed_time / duration) ** (1 / 3)  # нелинейное отображение корнем куба
 
-        window_x = (WINDOW_WIDTH * x) // 100
+        window_x = (WINDOW_WIDTH * (x + (width * (1 - progress) / 2))) // 100
         window_y = (WINDOW_HEIGHT * y) // 100
 
-        window_width = int((WINDOW_WIDTH * width) / 100 * (progress ** (1 / 3)))  # нелинейное отображение корнем куба
+        window_width = int((WINDOW_WIDTH * width) / 100 * progress)
         window_height = (WINDOW_HEIGHT * height) // 100
         n_rect = pg.Rect(window_x, window_y, window_width, window_height)
         pygame.draw.rect(screen, clr, n_rect, border_radius=border, width=border_width)
@@ -236,7 +263,7 @@ def darken_screen(screen, duration=3000):
         screen.blit(overlay, (0, 0))  # наложение затемненной поверхности на экран
         pg.draw.circle(overlay, (200, 0, 0, alpha), (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), int(radius))
         overlay_rect = overlay.get_rect()
-        print_text_in_bar(screen, font, 'Real Hero', overlay_rect, clr=(255, 255, 255))
+        print_text_in_bar(screen, font, "Buhs' Hero", overlay_rect, clr=(255, 255, 255))
         pg.display.flip()
 
         for event in pg.event.get():
@@ -245,3 +272,98 @@ def darken_screen(screen, duration=3000):
                 sys.exit()
 
         pg.time.Clock().tick(60)
+
+
+def menu_rating_func(font, screen, clock):
+    screen.fill((255, 255, 255))
+    db_json = requests.get("https://zxces.pythonanywhere.com/api/player_info/").text
+    db = json.loads(db_json)
+    menu_rating = True
+
+    for elm in db:
+        del elm['password']
+        del elm['achieves']['id']
+    scroll = 0
+    anima = True
+    while menu_rating:
+
+        screen.fill((255, 255, 255))
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_UP:
+                    scroll -= 1
+                elif event.key == K_DOWN:
+                    scroll += 1
+        scroll = abs(scroll % len(db))
+        headers = ['Name', 'Experience', 'Health', 'Points', 'Speedrun']
+        i = 25
+        for elm in headers:
+            cell_achieve = draw_rect(screen, i, 10, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
+            print_text_in_bar(screen, font, elm, cell_achieve, clr=pygame.Color('dodgerblue2'))
+            i += 10
+
+        j = 20
+        for k in range(scroll, len(db)):
+            i = 25
+            cell_login = draw_rect(screen, i, j, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
+            print_text_in_bar(screen, font, db[k]['login'], cell_login, clr=(0, 0, 0))
+            i += 10
+            for achieve in db[k]['achieves'].values():
+                if anima and k < 12:
+                    animate(screen, i, j, 10, 5, clr=(0, 0, 0), border=5, border_width=2, duration=5)
+                cell_achieve = draw_rect(screen, i, j, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
+                print_text_in_bar(screen, font, achieve, cell_achieve, clr=(0, 0, 0))
+                i += 10
+            j += 6
+        anima = False
+        pygame.display.flip()
+
+
+def death_screen(screen):
+    font = pg.font.Font('fonts/thin_pixel-7.ttf', 320)
+    original_image = pygame.image.load("images/blood.png")
+    image_rect = original_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
+    duration = 500
+    start_time = pg.time.get_ticks()
+    respawn_rect = draw_rect(screen, 30, 70, 40, 10, clr=(255, 0, 0), border_width=8)
+    # Главный цикл игры
+    while True:
+        elapsed_time = pg.time.get_ticks() - start_time
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        if elapsed_time < duration:
+            progress = 3 - 2.5 * (elapsed_time / duration) ** (1 / 5)
+            # Уменьшение размера изображения
+            scaled_image = pygame.transform.scale(original_image, (
+                int(image_rect.width * progress), int(image_rect.height * progress)))
+            screen.fill((0, 0, 0))
+            screen.blit(scaled_image, scaled_image.get_rect(center=image_rect.center))
+        else:
+            scaled_image = pygame.transform.scale(original_image, (
+                int(image_rect.width * 0.5), int(image_rect.height * 0.5)))
+            screen.fill((0, 0, 0))
+            screen.blit(scaled_image, scaled_image.get_rect(center=((WINDOW_WIDTH + random.randint(-50, 50)) // 2,
+                                                                    (WINDOW_HEIGHT + random.randint(-50, 50)) // 2)))
+            print_text_in_bar(screen, font, "ТЫ МЕРТВ",
+                              screen.get_rect(center=((WINDOW_WIDTH + random.randint(-10, 10)) // 2,
+                                                      (WINDOW_HEIGHT + random.randint(-10, 10)) // 2)),
+                              clr=(200, 200, 200))
+
+            draw_rect(screen, 30, 70, 40, 10, clr=(255, 0, 0), border_width=8)
+            print_text_in_bar(screen, pg.font.Font('fonts/thin_pixel-7.ttf', 60),
+                              'Возродиться', respawn_rect, bottom_pos=-5)
+            for event in pygame.event.get():
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if respawn_rect.collidepoint(event.pos):
+                        # какая то функция...
+                        pygame.quit()
+                        sys.exit()
+
+
+        pygame.display.flip()
+        pygame.time.Clock().tick(60)

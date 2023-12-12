@@ -4,7 +4,8 @@ from blocks import *
 from settings import *
 from pygame.locals import *
 from player import Player, AttackEffect
-from menu import menuFunc
+from player import Player
+from menu import menuFunc, death_screen
 
 pg.init()
 
@@ -81,7 +82,8 @@ def camera_configure(camera, target_rect):
 
 def main():
     run = True
-    reg = True
+    reg = False
+    username = 'АНОНИМУС'
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(level[0]) * PLATFORM_WIDTH
     total_level_height = len(level[0]) * PLATFORM_HEIGHT
@@ -94,7 +96,8 @@ def main():
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         if not reg:
-            reg = menuFunc()
+            reg, username = menuFunc()
+            print(f'ИМЯ ПОЛЬЗОВАТЕЛЯ: {username}')
         else:
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:

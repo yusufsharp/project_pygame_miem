@@ -4,6 +4,7 @@ from blocks import Platform, MovingPlatform, Lava
 import pyganim
 from enemies import *
 import pygame
+from menu import *
 
 MOVE_SPEED = 7
 ATTACK_WIDTH = 84
@@ -196,7 +197,7 @@ class Player(sprite.Sprite):
                         damage = 2
                         self.health_bar.hp -= damage
                         if self.health_bar.hp <= 0:
-                            self.die()
+                            sys.exit()
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
 
