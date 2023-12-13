@@ -47,7 +47,8 @@ def send_get_request(username, password):
 
         Если статус ответа равен 200, функция выводит информацию о найденном игроке и возвращает True.
         Если статус ответа равен 404, функция выводит сообщение о том, что игрок не найден, и возвращает False.
-        В случае любой другой ошибки, функция выводит сообщение об ошибке с указанием статуса и текста ответа, и возвращает False.
+        В случае любой другой ошибки, функция выводит сообщение об ошибке с указанием статуса
+            и текста ответа, и возвращает False.
         """
     url = f"https://zxces.pythonanywhere.com/api/player_info/{username}"
     params = {"login": username, "password": password}
@@ -80,8 +81,10 @@ def register_request(username, password):
         :rtype: tuple(bool, str)
         :raises requests.exceptions.RequestException: В случае ошибки при отправке GET-запроса.
 
-        Если статус ответа равен 200, функция выводит информацию о зарегистрированном игроке и возвращает кортеж (True, username).
-        В случае любой другой ошибки, функция выводит сообщение об ошибке с указанием статуса и текста ответа, и возвращает False.
+        Если статус ответа равен 200, функция выводит информацию о зарегистрированном игроке
+            и возвращает кортеж (True, username).
+        В случае любой другой ошибки, функция выводит сообщение об ошибке с указанием статуса
+            и текста ответа, и возвращает False.
         """
     url = f"https://zxces.pythonanywhere.com/register/{username}/{password}"  # генерит ссылку логин и пароль
     response = requests.get(url)
@@ -121,7 +124,30 @@ def send_patch_request(username, achieve_type, type_value, secure_key=SECURE_KEY
     return
 
 
-def menuFunc():
+def stat_request(username):
+    """
+        Получение статистики и достижений игрока из внешнего API.
+
+        :param username: Имя пользователя игрока, для которого необходимо получить информацию.
+        :type username: str
+        :return: Словарь, содержащий статистику и достижения игрока. Возвращает пустой словарь в случае ошибки запроса.
+        :rtype: dict
+        """
+    url = f"https://zxces.pythonanywhere.com/api/player_info/{username}"
+
+    response = requests.get(url)
+    if response.status_code == 200:
+        player_info = json.loads(response.text)
+        stats = player_info['achieves']
+        del stats['id']
+        print("Игрок найден. Информация о игроке:", stats)
+        return stats
+    else:
+        print(f"Произошла ошибка: {response.status_code}, {response.text}")
+        return dict()
+
+
+def menu_func():
     """
         Отображает главное меню игры.
 
@@ -135,44 +161,44 @@ def menuFunc():
     scaled_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))  # подгоняем изображение
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     screen.blit(scaled_image, (0, 0))  # отображаем изображение
-    font = pg.font.Font('fonts/thin_pixel-7.ttf', 36)
+    font_menu = pg.font.Font('fonts/thin_pixel-7.ttf', 36)
     animate(screen, 35, 20, 30, 10)  # анимация появления логин
     login_button_rect = draw_rect(screen, 35, 20, 30, 10)
-    print_text_in_bar(screen, font, 'Войти', login_button_rect, clr=(0, 0, 0))
+    print_text_in_bar(screen, font_menu, 'Войти', login_button_rect, clr=(0, 0, 0))
     animate(screen, 35, 40, 30, 10)  # анимация появления рейтинг
     register_button_rect = draw_rect(screen, 35, 40, 30, 10)
-    print_text_in_bar(screen, font, 'Рейтинг', register_button_rect, clr=(0, 0, 0))
+    print_text_in_bar(screen, font_menu, 'Рейтинг', register_button_rect, clr=(0, 0, 0))
 
     login_rating_active = False
     while not reg:
         # главный цикл отображает запускает все остальное
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for menu_event in pygame.event.get():
+            if menu_event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pg.MOUSEBUTTONDOWN:
-                if login_button_rect.collidepoint(event.pos) and not login_rating_active:
+            elif menu_event.type == pg.MOUSEBUTTONDOWN:
+                if login_button_rect.collidepoint(menu_event.pos) and not login_rating_active:
                     login_rating_active = True
                     print("Нажата кнопка 'Войти'")
-                    username = menu_reg_func(font, screen, username)
+                    username = menu_reg_func(font_menu, screen, username)
                     darken_screen(screen)
                     reg = True
-                elif register_button_rect.collidepoint(event.pos) and not login_rating_active:
+                elif register_button_rect.collidepoint(menu_event.pos) and not login_rating_active:
                     login_rating_active = True
                     print("Нажата кнопка 'Рейтинг'")
-                    menu_rating_func(font, screen, clock)
+                    menu_rating_func(font_menu, screen)
         pygame.display.flip()
         clock.tick(60)
 
     return reg, username
 
 
-def menu_reg_func(font, screen, username):
+def menu_reg_func(some_font, screen, username):
     """
         Отображает окно регистрации и обработку ввода пользователя.
 
-        :param font: Шрифт для текста.
-        :type font: pygame.font.Font
+        :param some_font: Шрифт для текста.
+        :type some_font: pygame.font.Font
         :param screen: Объект экрана Pygame.
         :type screen: pygame.Surface
         :param username: Текущее имя пользователя.
@@ -188,9 +214,9 @@ def menu_reg_func(font, screen, username):
     name_window = draw_rect(screen, 30, 30, 40, 10, clr=(0, 0, 0), border_width=2)
     pass_window = draw_rect(screen, 30, 45, 40, 10, clr=(0, 0, 0), border_width=2)
     init_window = draw_rect(screen, 45, 60, 10, 5, clr=(255, 0, 0), border_width=3)
-    name_text_rect = print_text_in_bar(screen, font, "Логин: ", name_window)
-    pass_text_rect = print_text_in_bar(screen, font, "Пароль: ", pass_window)
-    print_text_in_bar(screen, font, "Играть", init_window, right_pos=2, bottom_pos=-6, clr=(0, 0, 0))
+    name_text_rect = print_text_in_bar(screen, some_font, "Логин: ", name_window)
+    pass_text_rect = print_text_in_bar(screen, some_font, "Пароль: ", pass_window)
+    print_text_in_bar(screen, some_font, "Играть", init_window, right_pos=2, bottom_pos=-6, clr=(0, 0, 0))
 
     active_name = False  # нажатие на окно логина
     active_pass = False  # нажатие на окно пароля
@@ -200,23 +226,23 @@ def menu_reg_func(font, screen, username):
     while input_active:
         pygame.font.init()
 
-        for event in pygame.event.get():  # анализ клавиатуры
-            if event.type == pygame.QUIT:
+        for reg_event in pygame.event.get():  # анализ клавиатуры
+            if reg_event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if name_window.collidepoint(event.pos):
+            elif reg_event.type == pygame.MOUSEBUTTONDOWN:
+                if name_window.collidepoint(reg_event.pos):
                     active_name = True
                     active_pass = False
                     pygame.draw.rect(screen, (0, 255, 0), name_window, 2, border_radius=20)  # меняет цвет рамки логин
                     pygame.draw.rect(screen, (0, 0, 0), pass_window, 2, border_radius=20)  # меняет цвет пароль
-                elif pass_window.collidepoint(event.pos):
+                elif pass_window.collidepoint(reg_event.pos):
                     active_pass = True
                     active_name = False
                     pygame.draw.rect(screen, (0, 255, 0), pass_window, 2, border_radius=20)
                     pygame.draw.rect(screen, (0, 0, 0), name_window, 2, border_radius=20)
-                elif init_window.collidepoint(event.pos):  # нажатие на кнопку играть
+                elif init_window.collidepoint(reg_event.pos):  # нажатие на кнопку играть
                     if text_name != '' and text_pass != '':  # не пустые рамки с текстом
                         pygame.draw.rect(screen, (255, 255, 255), init_window)  # отбеливание батона
                         animate(screen, 45, 60, 10, 5, clr=(0, 255, 0))  # зеленый батон загрузки
@@ -233,22 +259,23 @@ def menu_reg_func(font, screen, username):
                                 pygame.draw.rect(screen, (255, 255, 255), init_window)  # отбеливание батона
                                 animate(screen, 45, 60, 10, 5, clr=(255, 0, 0))  # красный батон загрузки
                                 error_rect = draw_rect(screen, 35, 20, 30, 10)
-                                print_text_in_bar(screen, font, 'Неверный пароль!', error_rect, clr=(255, 0, 0))
+                                print_text_in_bar(screen, some_font, 'Неверный пароль!', error_rect, clr=(255, 0, 0))
                             else:
                                 pygame.draw.rect(screen, (255, 255, 255), init_window)  # отбеливание батона
                                 animate(screen, 45, 60, 10, 5, clr=pygame.Color('dodgerblue2'))  # синий батон загрузки
                                 print('Добро пожаловать!!!')
                                 input_active = False
 
-            elif event.type == pygame.KEYDOWN:  # любая клавиша текста
+            elif reg_event.type == pygame.KEYDOWN:  # любая клавиша текста
                 if active_name:  # функция обновляет и центрирует текст
-                    text_name = text_bar_updating(screen, event, font, name_window, text_name, name_text_rect)
+                    text_name = text_bar_updating(screen, reg_event, some_font, name_window, text_name, name_text_rect)
                 elif active_pass:
-                    text_pass = text_bar_updating(screen, event, font, pass_window, text_pass, pass_text_rect)
+                    text_pass = text_bar_updating(screen, reg_event, some_font, pass_window, text_pass, pass_text_rect)
 
                 if text_name != '' and text_pass != '':
                     pygame.draw.rect(screen, (255, 255, 255), init_window, border_radius=20)  # делает зеленую рамку
-                    print_text_in_bar(screen, font, "Играть", init_window, right_pos=2, bottom_pos=-6, clr=(0, 0, 0))
+                    print_text_in_bar(screen, some_font, "Играть", init_window, right_pos=2,
+                                      bottom_pos=-6, clr=(0, 0, 0))
                     pygame.draw.rect(screen, (0, 255, 0), init_window, 3, border_radius=20)
         pygame.display.flip()
     return username
@@ -270,8 +297,8 @@ def draw_rect(screen, x, y, width, height, clr=(255, 255, 255), border=20, borde
         :type height: float
         :param clr: Цвет прямоугольника в формате RGB.
         :type clr: tuple(int, int, int)
-        :param border_radius: Радиус скругления углов прямоугольника.
-        :type border_radius: int
+        :param border: Радиус скругления углов прямоугольника.
+        :type border: int
         :param border_width: Ширина границы прямоугольника.
         :type border_width: int
         :return: Объект Rect, представляющий координаты и размеры прямоугольника.
@@ -286,14 +313,14 @@ def draw_rect(screen, x, y, width, height, clr=(255, 255, 255), border=20, borde
     return n_rect
 
 
-def print_text_in_bar(screen, font, text, bar, right_pos=0, bottom_pos=0, clr=(200, 200, 200)):
+def print_text_in_bar(screen, some_font, text, bar, right_pos=0, bottom_pos=0, clr=(200, 200, 200)):
     """
         Отображает текст внутри прямоугольной области по центру.
 
         :param screen: Объект экрана Pygame.
         :type screen: pygame.Surface
-        :param font: Шрифт для текста.
-        :type font: pygame.font.Font
+        :param some_font: Шрифт для текста.
+        :type some_font: pygame.font.Font
         :param text: Текст, который нужно отобразить.
         :type text: str
         :param bar: Прямоугольная область, в которой будет отображен текст.
@@ -307,7 +334,7 @@ def print_text_in_bar(screen, font, text, bar, right_pos=0, bottom_pos=0, clr=(2
         :return: Объект Rect, представляющий координаты и размеры текста.
         :rtype: pygame.Rect
         """
-    bar_text = font.render(f"{text}", True, clr)
+    bar_text = some_font.render(f"{text}", True, clr)
 
     bar_text_rect = bar_text.get_rect()
     bar_text_rect.center = ((bar.right + bar.left + right_pos) // 2,
@@ -317,16 +344,16 @@ def print_text_in_bar(screen, font, text, bar, right_pos=0, bottom_pos=0, clr=(2
     return bar_text_rect
 
 
-def text_bar_updating(screen, event, font, window, text, text_rect):
+def text_bar_updating(screen, some_event, some_font, window, text, text_rect):
     """
         Обновляет и центрирует текст внутри прямоугольной области при вводе.
 
         :param screen: Объект экрана Pygame.
         :type screen: pygame.Surface
-        :param event: Объект события клавиатуры.
-        :type event: pygame.event.Event
-        :param font: Шрифт для текста.
-        :type font: pygame.font.Font
+        :param some_event: Объект события клавиатуры.
+        :type some_event: pygame.event.Event
+        :param some_font: Шрифт для текста.
+        :type some_font: pygame.font.Font
         :param window: Прямоугольная область, в которой отображается текст.
         :type window: pygame.Rect
         :param text: Текущий текст.
@@ -338,13 +365,13 @@ def text_bar_updating(screen, event, font, window, text, text_rect):
     """
     pygame.draw.rect(screen, (255, 255, 255), window)
     pygame.draw.rect(screen, (0, 255, 0), window, 2, border_radius=20)
-    if event.key == pygame.K_RETURN:
+    if some_event.key == pygame.K_RETURN:
         text = ""
-    elif event.key == pygame.K_BACKSPACE:
+    elif some_event.key == pygame.K_BACKSPACE:
         text = text[:-1]
     else:
-        text += event.unicode
-    text_surface = font.render(text, True, pygame.Color('dodgerblue2'))
+        text += some_event.unicode
+    text_surface = some_font.render(text, True, pygame.Color('dodgerblue2'))
     text_surface_rect = text_surface.get_rect()
     text_surface_rect.center = ((text_rect.right + text_rect.left) // 2,
                                 (text_rect.bottom + text_rect.top) // 2)
@@ -392,8 +419,8 @@ def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_
         window_height = (WINDOW_HEIGHT * height) // 100
         n_rect = pg.Rect(window_x, window_y, window_width, window_height)
         pygame.draw.rect(screen, clr, n_rect, border_radius=border, width=border_width)
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
+        for some_event in pg.event.get():
+            if some_event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
 
@@ -423,7 +450,7 @@ def darken_screen(screen, duration=3000):
             break
         progress = math.sin((elapsed_time / duration) * math.pi / 2)  # нелинейное отображение синусом
 
-        font = pg.font.Font('fonts/thin_pixel-7.ttf', int(32 + progress * 404))  # изменяем размер шрифта
+        some_font = pg.font.Font('fonts/thin_pixel-7.ttf', int(32 + progress * 404))  # изменяем размер шрифта
         alpha = int(progress * 255)
         overlay.set_alpha(alpha)  # просвет на поверхность
         radius = progress * WINDOW_WIDTH
@@ -431,29 +458,30 @@ def darken_screen(screen, duration=3000):
         screen.blit(overlay, (0, 0))  # наложение затемненной поверхности на экран
         pg.draw.circle(overlay, (200, 0, 0, alpha), (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), int(radius))
         overlay_rect = overlay.get_rect()
-        print_text_in_bar(screen, font, "Buhs' Hero", overlay_rect, clr=(255, 255, 255))
+        print_text_in_bar(screen, some_font, "Buhs' Hero", overlay_rect, clr=(255, 255, 255))
         pg.display.flip()
 
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
+        for some_event in pg.event.get():
+            if some_event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
 
         pg.time.Clock().tick(60)
 
 
-def menu_rating_func(font, screen):
+def menu_rating_func(some_font, screen):
     """
         Отображает рейтинг игроков с использованием анимации. Сначала отправляет GET-запрос на сервер для
         получения базы данных. Потом выводит ее в форме таблицы. Листать таблицу можно нажимая на клавиши PgUp
         и PgDown.
 
-        :param font: Шрифт для текста.
-        :type font: pygame.font.Font
+        :param some_font: Шрифт для текста.
+        :type some_font: pygame.font.Font
         :param screen: Объект экрана Pygame.
         :type screen: pygame.Surface
         :return: None
         """
+    animate(screen, 34, 40, 32, 10, clr=pygame.Color('dodgerblue2'))
     screen.fill((255, 255, 255))
     db_json = requests.get("https://zxces.pythonanywhere.com/api/player_info/").text
     db = json.loads(db_json)
@@ -462,39 +490,40 @@ def menu_rating_func(font, screen):
     for elm in db:
         del elm['password']
         del elm['achieves']['id']
+    db = sorted(db, key=lambda item: item['achieves']['points'], reverse=True)
     scroll = 0
     anima = True
     while menu_rating:
 
         screen.fill((255, 255, 255))
-        for event in pygame.event.get():
-            if event.type == QUIT:
+        for some_event in pygame.event.get():
+            if some_event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == KEYDOWN:
-                if event.key == K_UP:
+            elif some_event.type == KEYDOWN:
+                if some_event.key == K_UP:
                     scroll -= 1
-                elif event.key == K_DOWN:
+                elif some_event.key == K_DOWN:
                     scroll += 1
         scroll = abs(scroll % len(db))
         headers = ['Name', 'Experience', 'Health', 'Points', 'Speedrun']
         i = 25
         for elm in headers:
             cell_achieve = draw_rect(screen, i, 10, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
-            print_text_in_bar(screen, font, elm, cell_achieve, clr=pygame.Color('dodgerblue2'))
+            print_text_in_bar(screen, some_font, elm, cell_achieve, clr=pygame.Color('dodgerblue2'))
             i += 10
 
         j = 20
         for k in range(scroll, len(db)):
             i = 25
             cell_login = draw_rect(screen, i, j, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
-            print_text_in_bar(screen, font, db[k]['login'], cell_login, clr=(0, 0, 0))
+            print_text_in_bar(screen, some_font, db[k]['login'], cell_login, clr=(0, 0, 0))
             i += 10
             for achieve in db[k]['achieves'].values():
                 if anima and k < 12:
                     animate(screen, i, j, 10, 5, clr=(0, 0, 0), border=5, border_width=2, duration=5)
                 cell_achieve = draw_rect(screen, i, j, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
-                print_text_in_bar(screen, font, achieve, cell_achieve, clr=(0, 0, 0))
+                print_text_in_bar(screen, some_font, achieve, cell_achieve, clr=(0, 0, 0))
                 i += 10
             j += 6
         anima = False
@@ -511,7 +540,7 @@ def death_screen(screen):
         :type screen: pygame.Surface
         :return: None
         """
-    font = pg.font.Font('fonts/thin_pixel-7.ttf', 320)
+    some_font = pg.font.Font('fonts/thin_pixel-7.ttf', 320)
     original_image = pygame.image.load("images/blood.png")
     image_rect = original_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
     duration = 500
@@ -520,8 +549,8 @@ def death_screen(screen):
     # Главный цикл игры
     while True:
         elapsed_time = pg.time.get_ticks() - start_time
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for some_event in pygame.event.get():
+            if some_event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
         if elapsed_time < duration:
@@ -537,7 +566,7 @@ def death_screen(screen):
             screen.fill((0, 0, 0))
             screen.blit(scaled_image, scaled_image.get_rect(center=((WINDOW_WIDTH + random.randint(-50, 50)) // 2,
                                                                     (WINDOW_HEIGHT + random.randint(-50, 50)) // 2)))
-            print_text_in_bar(screen, font, "ТЫ МЕРТВ",
+            print_text_in_bar(screen, some_font, "ТЫ МЕРТВ",
                               screen.get_rect(center=((WINDOW_WIDTH + random.randint(-10, 10)) // 2,
                                                       (WINDOW_HEIGHT + random.randint(-10, 10)) // 2)),
                               clr=(200, 200, 200))
@@ -545,13 +574,12 @@ def death_screen(screen):
             draw_rect(screen, 30, 70, 40, 10, clr=(255, 0, 0), border_width=8)
             print_text_in_bar(screen, pg.font.Font('fonts/thin_pixel-7.ttf', 60),
                               'Возродиться', respawn_rect, bottom_pos=-5)
-            for event in pygame.event.get():
-                if event.type == pg.MOUSEBUTTONDOWN:
-                    if respawn_rect.collidepoint(event.pos):
+            for some_event in pygame.event.get():
+                if some_event.type == pg.MOUSEBUTTONDOWN:
+                    if respawn_rect.collidepoint(some_event.pos):
                         # какая то функция...
                         pygame.quit()
                         sys.exit()
-
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)

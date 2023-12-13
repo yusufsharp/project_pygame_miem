@@ -7,7 +7,7 @@ from blocks import *
 from settings import *
 from pygame.locals import *
 from player import Player
-from menu import menuFunc, death_screen
+from menu import menu_func, death_screen, stat_request
 
 pg.init()
 
@@ -76,8 +76,9 @@ def main():
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         if not reg:
-            reg, username = menuFunc()
+            reg, username = menu_func()
             print(f'ИМЯ ПОЛЬЗОВАТЕЛЯ: {username}')
+            print(stat_request(username))
         else:
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
