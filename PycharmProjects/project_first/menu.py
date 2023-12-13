@@ -9,6 +9,18 @@ import random
 
 
 def send_post_request(username, password):
+    """
+        Отправляет POST-запрос с предоставленными учетными данными нового пользователя.
+        Сервер регистрирует его в базу данных
+
+        :param username: Имя пользователя для отправки в запросе.
+        :type username: str
+        :param password: Пароль для отправки в запросе.
+        :type password: str
+        :return: Имя пользователя, отправленное в запросе.
+        :rtype: str
+        :raises requests.exceptions.RequestException: В случае ошибки при отправке POST-запроса.
+    """
     url = "https://zxces.pythonanywhere.com/myapp/api/player_info/"
     data = {"login": username, "password": password, "achieves": {
         'experience': 0,
@@ -17,11 +29,26 @@ def send_post_request(username, password):
         'completion_time': 0
     }}
     response = requests.post(url, json=data)
-    print(response.text)  # берет всю бд по адресу
+    print(response.text)
     return username
 
 
 def send_get_request(username, password):
+    """
+        Выполняет GET-запрос для получения информации об игроке по указанному имени пользователя.
+
+        :param username: Имя пользователя, для которого выполняется запрос.
+        :type username: str
+        :param password: Пароль, используемый в запросе для аутентификации.
+        :type password: str
+        :return: True, если игрок найден, False в противном случае.
+        :rtype: bool
+        :raises requests.exceptions.RequestException: В случае ошибки при отправке GET-запроса.
+
+        Если статус ответа равен 200, функция выводит информацию о найденном игроке и возвращает True.
+        Если статус ответа равен 404, функция выводит сообщение о том, что игрок не найден, и возвращает False.
+        В случае любой другой ошибки, функция выводит сообщение об ошибке с указанием статуса и текста ответа, и возвращает False.
+        """
     url = f"https://zxces.pythonanywhere.com/api/player_info/{username}"
     params = {"login": username, "password": password}
     # start_time = pg.time.get_ticks()
@@ -42,6 +69,20 @@ def send_get_request(username, password):
 
 
 def register_request(username, password):
+    """
+        Выполняет запрос на регистрацию игрока по указанному имени пользователя и паролю на сгенерированную ссылку.
+
+        :param username: Имя пользователя для регистрации.
+        :type username: str
+        :param password: Пароль для регистрации.
+        :type password: str
+        :return: Кортеж (True, username) в случае успешной регистрации, False в противном случае.
+        :rtype: tuple(bool, str)
+        :raises requests.exceptions.RequestException: В случае ошибки при отправке GET-запроса.
+
+        Если статус ответа равен 200, функция выводит информацию о зарегистрированном игроке и возвращает кортеж (True, username).
+        В случае любой другой ошибки, функция выводит сообщение об ошибке с указанием статуса и текста ответа, и возвращает False.
+        """
     url = f"https://zxces.pythonanywhere.com/register/{username}/{password}"  # генерит ссылку логин и пароль
     response = requests.get(url)
     if response.status_code == 200:
@@ -52,10 +93,26 @@ def register_request(username, password):
         return True, username
     else:
         print(f"Неверный пароль: {response.status_code}, {response.text}")
-        return False
+        return False, ''
 
 
 def send_patch_request(username, achieve_type, type_value, secure_key=SECURE_KEY):
+    """
+        Выполняет PATCH-запрос для обновления достижения игрока по указанному имени пользователя на
+        сгенерированную ссылку.
+
+        :param username: Имя пользователя, для которого выполняется запрос.
+        :type username: str
+        :param achieve_type: Тип достижения, которое необходимо обновить (например, 'experience').
+        :type achieve_type: str
+        :param type_value: Новое значение для достижения.
+        :type type_value: int
+        :param secure_key: Ключ безопасности (по умолчанию используется значение из глобальной переменной SECURE_KEY).
+        :type secure_key: str
+        :return: None
+
+        Результат выполнения запроса выводится на экран в виде статуса и JSON-данных ответа.
+        """
     url = f'https://zxces.pythonanywhere.com/update-achieves/{username}/{achieve_type}/{type_value}/'
     params = {'key': secure_key}
     response = requests.patch(url, params=params)
@@ -65,6 +122,12 @@ def send_patch_request(username, achieve_type, type_value, secure_key=SECURE_KEY
 
 
 def menuFunc():
+    """
+        Отображает главное меню игры.
+
+        :return: (reg, username), где reg - флаг прохождения регистрации, username - имя пользователя.
+        :rtype: tuple(bool, str)
+        """
     reg = False  # отвечает за отображение всего меню
     username = 'АНОНИМУС'
     clock = pygame.time.Clock()  # фпс
@@ -105,6 +168,18 @@ def menuFunc():
 
 
 def menu_reg_func(font, screen, username):
+    """
+        Отображает окно регистрации и обработку ввода пользователя.
+
+        :param font: Шрифт для текста.
+        :type font: pygame.font.Font
+        :param screen: Объект экрана Pygame.
+        :type screen: pygame.Surface
+        :param username: Текущее имя пользователя.
+        :type username: str
+        :return: Имя пользователя после регистрации.
+        :rtype: str
+        """
     input_active = True  # переменная которая отвечает за прогонку меню окна регистрации
     animate(screen, 20, 20, 60, 50, clr=(255, 255, 255, 128), duration=300)
     draw_rect(screen, 20, 20, 60, 50, clr=(255, 255, 255, 128))
@@ -180,6 +255,28 @@ def menu_reg_func(font, screen, username):
 
 
 def draw_rect(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0):
+    """
+        Рисует прямоугольник на экране.
+
+        :param screen: Объект экрана Pygame.
+        :type screen: pygame.Surface
+        :param x: Позиция по горизонтали в процентах от ширины экрана.
+        :type x: float
+        :param y: Позиция по вертикали в процентах от высоты экрана.
+        :type y: float
+        :param width: Ширина прямоугольника в процентах от ширины экрана.
+        :type width: float
+        :param height: Высота прямоугольника в процентах от высоты экрана.
+        :type height: float
+        :param clr: Цвет прямоугольника в формате RGB.
+        :type clr: tuple(int, int, int)
+        :param border_radius: Радиус скругления углов прямоугольника.
+        :type border_radius: int
+        :param border_width: Ширина границы прямоугольника.
+        :type border_width: int
+        :return: Объект Rect, представляющий координаты и размеры прямоугольника.
+        :rtype: pygame.Rect
+        """
     window_x = (WINDOW_WIDTH * x) // 100
     window_y = (WINDOW_HEIGHT * y) // 100
     window_width = (WINDOW_WIDTH * width) // 100
@@ -190,6 +287,26 @@ def draw_rect(screen, x, y, width, height, clr=(255, 255, 255), border=20, borde
 
 
 def print_text_in_bar(screen, font, text, bar, right_pos=0, bottom_pos=0, clr=(200, 200, 200)):
+    """
+        Отображает текст внутри прямоугольной области по центру.
+
+        :param screen: Объект экрана Pygame.
+        :type screen: pygame.Surface
+        :param font: Шрифт для текста.
+        :type font: pygame.font.Font
+        :param text: Текст, который нужно отобразить.
+        :type text: str
+        :param bar: Прямоугольная область, в которой будет отображен текст.
+        :type bar: pygame.Rect
+        :param right_pos: Позиция текста от правого края прямоугольной области.
+        :type right_pos: int
+        :param bottom_pos: Позиция текста от нижнего края прямоугольной области.
+        :type bottom_pos: int
+        :param clr: Цвет текста в формате RGB.
+        :type clr: tuple(int, int, int)
+        :return: Объект Rect, представляющий координаты и размеры текста.
+        :rtype: pygame.Rect
+        """
     bar_text = font.render(f"{text}", True, clr)
 
     bar_text_rect = bar_text.get_rect()
@@ -201,6 +318,24 @@ def print_text_in_bar(screen, font, text, bar, right_pos=0, bottom_pos=0, clr=(2
 
 
 def text_bar_updating(screen, event, font, window, text, text_rect):
+    """
+        Обновляет и центрирует текст внутри прямоугольной области при вводе.
+
+        :param screen: Объект экрана Pygame.
+        :type screen: pygame.Surface
+        :param event: Объект события клавиатуры.
+        :type event: pygame.event.Event
+        :param font: Шрифт для текста.
+        :type font: pygame.font.Font
+        :param window: Прямоугольная область, в которой отображается текст.
+        :type window: pygame.Rect
+        :param text: Текущий текст.
+        :type text: str
+        :param text_rect: Объект Rect, представляющий координаты и размеры текста.
+        :type text_rect: pygame.Rect
+        :return: Обновленный текст.
+        :rtype: str
+    """
     pygame.draw.rect(screen, (255, 255, 255), window)
     pygame.draw.rect(screen, (0, 255, 0), window, 2, border_radius=20)
     if event.key == pygame.K_RETURN:
@@ -219,6 +354,29 @@ def text_bar_updating(screen, event, font, window, text, text_rect):
 
 
 def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_width=0, duration=250):
+    """
+        Анимирует появление прямоугольной области на экране. Нелинейная анимация от корня куба
+
+        :param screen: Объект экрана Pygame.
+        :type screen: pygame.Surface
+        :param x: Позиция по горизонтали в процентах от ширины экрана.
+        :type x: float
+        :param y: Позиция по вертикали в процентах от высоты экрана.
+        :type y: float
+        :param width: Ширина прямоугольника в процентах от ширины экрана.
+        :type width: float
+        :param height: Высота прямоугольника в процентах от высоты экрана.
+        :type height: float
+        :param clr: Цвет прямоугольника в формате RGB.
+        :type clr: tuple(int, int, int)
+        :param border: Радиус скругления углов прямоугольника.
+        :type border: int
+        :param border_width: Ширина границы прямоугольника.
+        :type border_width: int
+        :param duration: Длительность анимации в миллисекундах.
+        :type duration: int
+        :return: None
+        """
     start_time = pg.time.get_ticks()
     while True:
         elapsed_time = pg.time.get_ticks() - start_time
@@ -244,6 +402,16 @@ def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_
 
 
 def darken_screen(screen, duration=3000):
+    """
+        Затемняет экран с и выводит название игры и увеличивающийся круг посредством анимации.
+        В качестве главной заставки игры.
+
+        :param screen: Объект экрана Pygame.
+        :type screen: pygame.Surface
+        :param duration: Длительность анимации в миллисекундах.
+        :type duration: int
+        :return: None
+        """
     overlay = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
     overlay.fill((0, 0, 0))  # задаем черный цвет, чистим экран
     alpha = 0
@@ -274,7 +442,18 @@ def darken_screen(screen, duration=3000):
         pg.time.Clock().tick(60)
 
 
-def menu_rating_func(font, screen, clock):
+def menu_rating_func(font, screen):
+    """
+        Отображает рейтинг игроков с использованием анимации. Сначала отправляет GET-запрос на сервер для
+        получения базы данных. Потом выводит ее в форме таблицы. Листать таблицу можно нажимая на клавиши PgUp
+        и PgDown.
+
+        :param font: Шрифт для текста.
+        :type font: pygame.font.Font
+        :param screen: Объект экрана Pygame.
+        :type screen: pygame.Surface
+        :return: None
+        """
     screen.fill((255, 255, 255))
     db_json = requests.get("https://zxces.pythonanywhere.com/api/player_info/").text
     db = json.loads(db_json)
@@ -323,6 +502,15 @@ def menu_rating_func(font, screen, clock):
 
 
 def death_screen(screen):
+    """
+        Отображает экран смерти персонажа с возможностью возрождения и обновления данных игрока.
+        Анимация представляет нелинейную функцию появления крови (корень 5-й степени), затем
+        подергивания вследствие генерации случайных координат каждый момент времени.
+
+        :param screen: Объект экрана Pygame.
+        :type screen: pygame.Surface
+        :return: None
+        """
     font = pg.font.Font('fonts/thin_pixel-7.ttf', 320)
     original_image = pygame.image.load("images/blood.png")
     image_rect = original_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
