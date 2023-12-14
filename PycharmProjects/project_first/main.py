@@ -23,26 +23,23 @@ pygame.display.set_icon(icon)
 #marat
 
 def load_level(level):
-    global entities, platforms, hero, monsters, moving_platform, status, attack_effect
+    global entities, platforms, hero, monsters, moving_platforms, status, attack_effect
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
 
-    hero = Player(1064, 2000, username = 'Дрочеслав')  # создаем героя по (x,y) координатам
+    hero = Player(1064, 1850, username = 'Дрочеслав')  # создаем героя по (x,y) координатам
     status = StatusBar(800, 900, screen)
     attack_effect = AttackEffect(hero)
 
     monsters = pygame.sprite.Group()
-
-    moving_platform = MovingPlatform(2064, 900, IMGS_PLATFORM['^'], 2064, 2904, 3)
-    moving_platform.set_hero(hero)
-    entities.add(hero, moving_platform)
     entities.add(attack_effect)
-    platforms.append(moving_platform)
+
+    moving_platforms = []
 
     x = y = 0
     for row in level:
         for col in row:
-            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g':
+            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g' and col != 'p':
                 pf = Platform(x, y, IMGS_PLATFORM[col])
                 entities.add(pf)
                 platforms.append(pf)
@@ -64,6 +61,12 @@ def load_level(level):
                 entities.add(gm)
                 platforms.append(gm)
                 monsters.add(gm)
+            elif col == 'p':
+                moving_platform = MovingPlatform(x, y, IMGS_PLATFORM['^'], x, x + 900, 4)
+                moving_platform.set_hero(hero)
+                entities.add(hero, moving_platform)
+                platforms.append(moving_platform)
+                moving_platforms.append(moving_platform)
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0
@@ -102,7 +105,9 @@ def main():
     camera = Camera(camera_configure, total_level_width, total_level_height)
     while run:
 
-
+        if hero.restart:
+            load_level(levels[current_level])
+            hero.restart = False
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         if not reg:
@@ -153,7 +158,8 @@ def main():
 
         screen.blit(hero.image, camera.apply(hero))
         hero.update(left, right, up, platforms, attack, screen)
-        moving_platform.update()
+        for mvp in moving_platforms:
+            mvp.update(len(moving_platforms))
         monsters.update(platforms)
         hero.draw_health_bar(screen)
         status.update(hero, clock)

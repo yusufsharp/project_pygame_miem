@@ -63,6 +63,7 @@ class Player(sprite.Sprite):
         self.yvel = 0  # скорость вертикального перемещения
         self.onGround = False  # На земле ли я?
         self.next_level = False
+        self.restart = False
 
         self.image = Surface((WIDTH, HEIGHT))
         self.image.fill(Color(COLOR))
@@ -191,7 +192,10 @@ class Player(sprite.Sprite):
         self.collide(self.xvel, 0, platforms, attack, screen)
 
     def die(self, screen):
-        death_screen(screen)
+        self.rect.x = 1064
+        self.rect.y = 1850
+        self.restart = death_screen(screen)
+
         #sys.exit()
 
 
