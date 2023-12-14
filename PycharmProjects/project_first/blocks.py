@@ -3,12 +3,14 @@ from pygame import *
 import sys
 from settings import *
 
+
 class Platform(sprite.Sprite):
     def __init__(self, x, y, image_path):
         sprite.Sprite.__init__(self)
         self.image = image.load(image_path)
         self.image = pg.transform.scale(self.image, (PLATFORM_WIDTH, PLATFORM_HEIGHT))
         self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
+
 
 class MovingPlatform(Platform):
     def __init__(self, x, y, image_path, start_x, end_x, speed):
@@ -18,7 +20,7 @@ class MovingPlatform(Platform):
         self.start_x = start_x
         self.end_x = end_x
         self.speed = speed
-        self.direction = 1 #1 - right, -1 - left
+        self.direction = 1  # 1 - right, -1 - left
         self.hero = None
 
     def set_hero(self, hero):
@@ -32,6 +34,7 @@ class MovingPlatform(Platform):
 
         if self.hero and self.hero.on_moving_platform:
             self.hero.rect.x += self.direction * self.speed
+
 
 class Lava(Platform):
     def __init__(self, x, y, images):

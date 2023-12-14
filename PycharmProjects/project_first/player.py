@@ -1,8 +1,5 @@
-import sys
-from pygame import *
 from blocks import Platform, MovingPlatform, Lava
-import pyganim
-from enemies import *
+from settings import *
 import pygame
 from menu import *
 
@@ -25,10 +22,19 @@ ANIMATION_STAY_RIGHT = [f"assets_sprites/idle/Idle_r{i}.png" for i in range(5)]
 ANIMATION_ATTACK_RIGHT = [f'assets_sprites/Attack-01/attack_r{i}.png' for i in range(1, 6)]
 ANIMATION_ATTACK_LEFT = [f'assets_sprites/Attack-01/attack_l{i}.png' for i in range(1, 6)]
 
+pygame.init()
+
+headingfont = pygame.font.SysFont("Corbel", 40)
+regularfont = pygame.font.SysFont('Corbel', 25)
+smallerfont = pygame.font.SysFont('Corbel', 16)
+
 enemy = Enemy
+golem = Enemy2
 
+color_light = (170, 170, 170)
+color_dark = (100, 100, 100)
+color_white = (255, 255, 255)
 
-# ... (existing code)
 
 class HealthBar():
     def __init__(self, x, y, w, h, max_hp):
@@ -50,6 +56,8 @@ class Player(sprite.Sprite):
     def __init__(self, x, y):
         sprite.Sprite.__init__(self)
 
+        self.username = "Buhs_hero"
+
         self.xvel = 0  # скорость перемещения. 0 - стоять на месте
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
         self.startY = y
@@ -63,7 +71,9 @@ class Player(sprite.Sprite):
         self.direction = True
         self.on_moving_platform = False
 
-        self.health_bar = HealthBar(x - 900, y - 1950, 128, 10, max_hp=100)
+        self.exp = 0
+
+        self.health_bar = HealthBar(x - 900, y - 1950, 256, 45, max_hp=100)
 
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
         #        Анимация движения вправо
@@ -191,8 +201,7 @@ class Player(sprite.Sprite):
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
                     if attack:
-                        platforms.remove(p)
-                        p.kill()
+                        p.hp -= 2
                     else:
                         damage = 2
                         self.health_bar.hp -= damage
@@ -262,10 +271,23 @@ class AttackEffect(sprite.Sprite):
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
                     if attack:
-                        platforms.remove(p)
-                        p.kill()
+                        p.hp -= 2
+                        if p.hp <= 0:
+                            platforms.remove(p)
+                            p.kill()
                     else:
                         damage = 2
+                        self.health_bar.hp -= damage
+                        if self.health_bar.hp <= 0:
+                            self.die()
+                if isinstance(p, Enemy2):
+                    if attack:
+                        p.hp -= 2
+                        if p.hp <= 0:
+                            platforms.remove(p)
+                            p.kill()
+                    else:
+                        damage = 7
                         self.health_bar.hp -= damage
                         if self.health_bar.hp <= 0:
                             self.die()
@@ -273,3 +295,58 @@ class AttackEffect(sprite.Sprite):
     def draw(self, attack, surface):
         if attack:
             surface.blit(self.image, self.rect.topleft)
+
+
+class StatusBar(sprite.Sprite):
+    def __init__(self, x, y, screen):
+        sprite.Sprite.__init__(self)
+        self.font = pygame.font.SysFont('Corbel', 25)
+        self.rect = Rect(x, y, 200, 100)  # You can adjust the size as needed
+        self.screen = screen
+
+    def update(self, player, clock):
+        username_text = self.font.render(f"USERNAME: {player.username}", True, (255, 255, 255))
+        exp_text = self.font.render(f"EXP: {player.exp}", True, (255, 255, 255))
+        total_seconds = pygame.time.get_ticks() // 1000
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        time_text = self.font.render(f"TIME: {minutes:02}:{seconds:02}", True, (255, 255, 255))
+        fps_text = self.font.render(f"FPS: {int(clock.get_fps())}", True, (255, 255, 255))
+
+        # Draw the text on the status bar
+        pygame.draw.rect(self.screen, (0, 0, 0), self.rect)
+        self.screen.blit(username_text, (self.rect.x + 10, self.rect.y + 10))
+        self.screen.blit(exp_text, (self.rect.x + 10, self.rect.y + 40))
+        self.screen.blit(time_text, (self.rect.x + 10, self.rect.y + 70))
+        self.screen.blit(fps_text, (self.rect.x + 10, self.rect.y + 100))
+
+
+ANIMATION_COIN = [f'objects/Coin-{i}.png' for i in range(1, 8)]
+
+
+class Coin(sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.x = x
+        self.y = y
+
+        self.image = Surface((16, 16))
+        self.image.fill(Color(COLOR))
+
+        self.rect = Rect(x, y, 16, 16)
+
+        boltAnim = []
+        for anim in ANIMATION_COIN:
+            boltAnim.append((anim, 60))
+        self.AnimCoin = pyganim.PygAnimation(boltAnim)
+        self.AnimCoin.play()
+
+    def update(self, hero):
+        self.collide(hero)
+        self.image.set_colorkey(Color(COLOR))
+        self.AnimCoin.blit(self.image, (0, 0))
+
+    def collide(self, hero):
+        if self.rect.colliderect(hero.rect):
+            self.kill()
+            hero.exp += 2

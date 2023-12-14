@@ -4,7 +4,7 @@ from blocks import *
 from settings import *
 from pygame.locals import *
 from player import Player, AttackEffect
-from player import Player
+from player import Player, Coin, StatusBar
 from menu import menuFunc, death_screen
 
 pg.init()
@@ -23,6 +23,7 @@ entities = pygame.sprite.Group()
 platforms = []  # создаем героя по (x,y) координатам
 
 hero = Player(1064, 2000)  # создаем героя по (x,y) координатам
+status = StatusBar(800, 900, screen)
 attack_effect = AttackEffect(hero)
 entities.add(attack_effect)
 
@@ -48,9 +49,9 @@ for row in level:
     x = 0
 
 monsters = pygame.sprite.Group()
-mn = Enemy(2600, 1095, 2, 0, 100, 0)
-mn2 = Enemy(2300, 1095, 2, 0, 100, 0)
-golem1 = Enemy2(2000, 1888, 1, 0, 200, 0, hero)
+mn = Enemy(2600, 1095, 2, 0, 100, 0, 30)
+mn2 = Enemy(2300, 1095, 2, 0, 100, 0, 30)
+golem1 = Enemy2(2000, 1888, 1, 0, 200, 0, hero, 150)
 entities.add(mn)
 entities.add(mn2)
 entities.add(golem1)
@@ -58,6 +59,9 @@ platforms.append(mn)
 platforms.append(mn2)
 platforms.append(golem1)
 monsters.add(mn, mn2, golem1)
+
+coin = Coin(2333, 1888)
+entities.add(coin)
 
 
 class Camera(object):
@@ -82,7 +86,7 @@ def camera_configure(camera, target_rect):
 
 def main():
     run = True
-    reg = False
+    reg = True
     username = 'АНОНИМУС'
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(level[0]) * PLATFORM_WIDTH
@@ -138,9 +142,13 @@ def main():
             screen.blit(e.image, camera.apply(e))
         moving_platform.update()
 
+        coin.update(hero)
+
         monsters.update(platforms)
 
         hero.draw_health_bar(screen)
+        status.update(hero, clock)
+
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)

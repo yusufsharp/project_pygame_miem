@@ -263,7 +263,7 @@ def darken_screen(screen, duration=3000):
         screen.blit(overlay, (0, 0))  # наложение затемненной поверхности на экран
         pg.draw.circle(overlay, (200, 0, 0, alpha), (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), int(radius))
         overlay_rect = overlay.get_rect()
-        print_text_in_bar(screen, font, "Buhs' Hero", overlay_rect, clr=(255, 255, 255))
+        print_text_in_bar(screen, font, "Buhs hero", overlay_rect, clr=(255, 255, 255))
         pg.display.flip()
 
         for event in pg.event.get():
