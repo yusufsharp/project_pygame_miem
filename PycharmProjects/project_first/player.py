@@ -185,16 +185,17 @@ class Player(sprite.Sprite):
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms, self.on_moving_platform, attack, screen)
+        self.collide(0, self.yvel, platforms, attack, screen)
 
         self.rect.x += self.xvel  # переносим свои положение на xvel
+        self.collide(self.xvel, 0, platforms, attack, screen)
 
     def die(self, screen):
         death_screen(screen)
         #sys.exit()
 
 
-    def collide(self, xvel, yvel, platforms, on_moving_platform, attack, screen):
+    def collide(self, xvel, yvel, platforms, attack, screen):
         for p in platforms:
             if sprite.collide_rect(self, p) and not isinstance(p, Teleport):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
@@ -222,7 +223,9 @@ class Player(sprite.Sprite):
 
                 if isinstance(p, MovingPlatform):
                     self.on_moving_platform = True
-                elif isinstance(p, Lava):
+                else:
+                    self.on_moving_platform = False
+                if isinstance(p, Lava):
                     self.die(screen)
             if sprite.collide_rect(self, p) and isinstance(p, Teleport):
                 self.next_level = True
