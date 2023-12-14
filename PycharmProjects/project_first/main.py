@@ -18,37 +18,43 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 icon = pygame.image.load('images/icon.png')
 pygame.display.set_icon(icon)
 
-entities = pygame.sprite.Group()
-platforms = []  # создаем героя по (x,y) координатам
 
-hero = Player(1064, 2000)  # создаем героя по (x,y) координатам
 
-moving_platform = MovingPlatform(2064, 900, IMGS_PLATFORM['^'], 2064, 2904, 3)
-moving_platform.set_hero(hero)
-entities.add(hero, moving_platform)
-platforms.append(moving_platform)
+def load_level(level):
+    global entities, platforms, hero, monsters, moving_platform
+    entities = pygame.sprite.Group()
+    platforms = []  # создаем героя по (x,y) координатам
 
-x = y = 0
+    hero = Player(1064, 2000)  # создаем героя по (x,y) координатам
 
-for row in level:
-    for col in row:
-        if col != ' ' and col != 'L':
-            pf = Platform(x, y, IMGS_PLATFORM[col])
-            entities.add(pf)
-            platforms.append(pf)
-        elif col == 'L':
-            lava = Lava(x, y, lava_images)
-            entities.add(lava)
-            platforms.append(lava)
-        x += PLATFORM_WIDTH
-    y += PLATFORM_HEIGHT
-    x = 0
+    moving_platform = MovingPlatform(2064, 900, IMGS_PLATFORM['^'], 2064, 2904, 3)
+    moving_platform.set_hero(hero)
+    entities.add(hero, moving_platform)
+    platforms.append(moving_platform)
+    x = y = 0
+    for row in level:
+        for col in row:
+            if col != ' ' and col != 'L' and col != 'T':
+                pf = Platform(x, y, IMGS_PLATFORM[col])
+                entities.add(pf)
+                platforms.append(pf)
+            elif col == 'L':
+                lava = Lava(x, y, lava_images)
+                entities.add(lava)
+                platforms.append(lava)
+            elif col == 'T':
+                tp = Teleport(x, y, IMGS_PLATFORM[col])
+                entities.add(tp)
+                platforms.append(tp)
+            x += PLATFORM_WIDTH
+        y += PLATFORM_HEIGHT
+        x = 0
 
-monsters = pygame.sprite.Group()
-mn = Enemy(2600, 1095, 2, 0, 100, 0)
-entities.add(mn)
-platforms.append(mn)
-monsters.add(mn)
+    monsters = pygame.sprite.Group()
+    mn = Enemy(2600, 1095, 2, 0, 100, 0)
+    entities.add(mn)
+    platforms.append(mn)
+    monsters.add(mn)
 
 
 class Camera(object):
@@ -72,11 +78,13 @@ def camera_configure(camera, target_rect):
 
 
 def main():
+    current_level = 0
     run = True
     reg = True
+    load_level(levels[current_level])
     attack = left = right = up = False  # по умолчанию — стоим
-    total_level_width = len(level[0]) * PLATFORM_WIDTH
-    total_level_height = len(level[0]) * PLATFORM_HEIGHT
+    total_level_width = len(levels[current_level][0]) * PLATFORM_WIDTH
+    total_level_height = len(levels[current_level][0]) * PLATFORM_HEIGHT
 
     camera = Camera(camera_configure, total_level_width, total_level_height)
     while run:
@@ -111,17 +119,22 @@ def main():
                     attack = False
 
         bg.fill(Color(BACKGROUND_COLOR))
-        screen.blit(background_image, (0, 0))
+        screen.blit(background_image, (0, 0)) 
         screen.blit(overlay, (0, 0))
 
-        hero.update(left, right, up, platforms, attack)
+        if hero.next_level and current_level == 0:
+            current_level += 1
+            load_level(levels[current_level])
+            hero.next_level = False
 
         camera.update(hero)
         for e in entities:
             if isinstance(e, Lava):
                 e.animate()
-
-            screen.blit(e.image, camera.apply(e))
+            if not isinstance(e, Player):  # Отрисовываем телепорт перед героем
+                screen.blit(e.image, camera.apply(e))
+        screen.blit(hero.image, camera.apply(hero))
+        hero.update(left, right, up, platforms, attack)
         moving_platform.update()
 
         monsters.update(platforms)

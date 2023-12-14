@@ -1,6 +1,6 @@
 import sys
 from pygame import *
-from blocks import Platform, MovingPlatform, Lava
+from blocks import Platform, MovingPlatform, Lava, Teleport
 import pyganim
 from enemies import *
 
@@ -35,6 +35,7 @@ class Player(sprite.Sprite):
         self.startY = y
         self.yvel = 0  # скорость вертикального перемещения
         self.onGround = False  # На земле ли я?
+        self.next_level = False
 
         self.image = Surface((WIDTH, HEIGHT))
         self.image.fill(Color(COLOR))
@@ -163,7 +164,7 @@ class Player(sprite.Sprite):
 
     def collide(self, xvel, yvel, platforms, on_moving_platform, attack):
         for p in platforms:
-            if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
+            if sprite.collide_rect(self, p) and not isinstance(p, Teleport):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
                     if attack:
                         platforms.remove(p)
@@ -191,3 +192,5 @@ class Player(sprite.Sprite):
                 elif isinstance(p, Lava):
                     quit()
                     sys.exit()
+            if sprite.collide_rect(self, p) and isinstance(p, Teleport):
+                self.next_level = True

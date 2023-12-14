@@ -49,3 +49,10 @@ class Lava(Platform):
             self.animation_timer = now
             self.image_index = (self.image_index + 1) % len(self.images)
             self.image = self.images[self.image_index]
+
+class Teleport(Platform):
+    def __init__(self, x, y, image_path):
+        super().__init__(x, y, image_path)
+        self.image = pg.image.load(image_path)
+        self.image = pg.transform.scale(self.image, (PLATFORM_WIDTH, PLATFORM_HEIGHT))
+        self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
