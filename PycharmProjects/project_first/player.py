@@ -1,5 +1,8 @@
+import sys
 from pygame import *
+from blocks import Platform, MovingPlatform, Lava, Teleport
 import pyganim
+from enemies import *
 
 MOVE_SPEED = 7
 ATTACK_WIDTH = 84
@@ -20,6 +23,8 @@ ANIMATION_STAY_RIGHT = [f"assets_sprites/idle/Idle_r{i}.png" for i in range(5)]
 ANIMATION_ATTACK_RIGHT = [f'assets_sprites/Attack-01/attack_r{i}.png' for i in range(1, 6)]
 ANIMATION_ATTACK_LEFT = [f'assets_sprites/Attack-01/attack_l{i}.png' for i in range(1, 6)]
 
+enemy = Enemy
+
 
 class Player(sprite.Sprite):
     def __init__(self, x, y):
@@ -30,12 +35,14 @@ class Player(sprite.Sprite):
         self.startY = y
         self.yvel = 0  # скорость вертикального перемещения
         self.onGround = False  # На земле ли я?
+        self.next_level = False
 
         self.image = Surface((WIDTH, HEIGHT))
         self.image.fill(Color(COLOR))
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
 
         self.direction = True
+        self.on_moving_platform = False
 
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
         #        Анимация движения вправо
@@ -101,6 +108,8 @@ class Player(sprite.Sprite):
                 self.boltAnimJumpRight.blit(self.image, (0, 0))
             else:
                 self.boltAnimJumpLeft.blit(self.image, (0, 0))
+
+            self.on_moving_platform = False
         if left:
             self.direction = False
             self.xvel = -MOVE_SPEED  # Лево = x- n
@@ -132,7 +141,9 @@ class Player(sprite.Sprite):
 
         if attack:
             self.image = Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
+            self.image.set_colorkey(Color(COLOR))
             self.image.fill(Color(COLOR))
+            self.image.set_colorkey(Color(COLOR))
             if self.direction is True:
                 self.boltAnimAttackRight.blit(self.image, (0, 0))
             if self.direction is False:
@@ -140,14 +151,26 @@ class Player(sprite.Sprite):
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms)
+        self.collide(0, self.yvel, platforms, self.on_moving_platform, attack)
 
         self.rect.x += self.xvel  # переносим свои положение на xvel
-        self.collide(self.xvel, 0, platforms)
 
-    def collide(self, xvel, yvel, platforms):
+    def die(self):
+        sys.exit()
+
+    def teleporting(self, goX, goY):
+        self.rect.x = goX
+        self.rect.y = goY
+
+    def collide(self, xvel, yvel, platforms, on_moving_platform, attack):
         for p in platforms:
-            if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
+            if sprite.collide_rect(self, p) and not isinstance(p, Teleport):  # если есть пересечение платформы с игроком
+                if isinstance(p, Enemy):
+                    if attack:
+                        platforms.remove(p)
+                        p.kill()
+                    else:
+                        self.die()
 
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
@@ -163,3 +186,11 @@ class Player(sprite.Sprite):
                 if yvel < 0:  # если движется вверх
                     self.rect.top = p.rect.bottom  # то не движется вверх
                     self.yvel = 0  # и энергия прыжка пропадает
+
+                if isinstance(p, MovingPlatform):
+                    self.on_moving_platform = True
+                elif isinstance(p, Lava):
+                    quit()
+                    sys.exit()
+            if sprite.collide_rect(self, p) and isinstance(p, Teleport):
+                self.next_level = True
