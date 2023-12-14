@@ -64,8 +64,8 @@ class Enemy(sprite.Sprite):
 ANIMATION_GOLEM_IDLE = [f'assets_sprites/enemy2/en2_i/en2_idle{i}.png' for i in range(4)]
 ANIMATION_GOLEM_WALK_LEFT = [f'assets_sprites/enemy2/en2_w/en2_walk{i}.png' for i in range(7)]
 ANIMATION_GOLEM_WALK_RIGHT = [f'assets_sprites/enemy2/en2_w/en2_walk{i}_r.png' for i in range(7)]
-ANIMATION_GOLEM_ATTACK_LEFT = [f'assets_sprites/enemy2/en2_a/en2_attack{i}.png' for i in range(6)]
-ANIMATION_GOLEM_ATTACK_RIGHT = [f'assets_sprites/enemy2/en2_a/en2_attack{i}_r.png' for i in range(5)]
+ANIMATION_GOLEM_ATTACK_LEFT = [f'assets_sprites/enemy2/en2_a/_en2_attack{i}.png' for i in range(6)]
+ANIMATION_GOLEM_ATTACK_RIGHT = [f'assets_sprites/enemy2/en2_a/_en2_attack{i}_r.png' for i in range(5)]
 ANIMATION_GOLEM_DIE = [f'assets_sprites/enemy2/en2_d/en2_die{i}.png' for i in range(8)]
 
 
@@ -144,41 +144,39 @@ class Enemy2(sprite.Sprite):
                 self.yvel = - self.yvel
                 self.hp -= 2
                 if self.hp <= 0:
-                    self.die()
+                    self.die(platforms)
 
-    def die(self):
+    def die(self, platforms):
         self.kill()
-        self.remove()
-
-    def attack(self):
-        print('enemy is attacking')
-        if self.xvel > 0:
-            self.image.fill(Color(ENEMY_COLOR))
-            self.boltAnimAttackRight.blit(self.image, (0, 0))
-        else:
-            self.image.fill(Color(ENEMY_COLOR))
-            self.boltAnimAttackLeft.blit(self.image, (0, 0))
+        platforms.remove(self)
 
     def update(self, platforms):
-        self.rect.x += self.xvel
-        if self.hp <= 0:
-            self.kill()
-            self.remove()
 
-        self.collide(platforms)
+        player_distance = math.sqrt((self.rect.x - self.player.rect.x) ** 2 + (self.rect.y - self.player.rect.y) ** 2)
 
-        if self.xvel > 0:
-            self.direction = True
-            self.image.fill(Color(ENEMY_COLOR))
-            self.boltAnimWalkRight.blit(self.image, (0, 0))
-        elif self.xvel < 0:
-            self.direction = False
-            self.image.fill(Color(ENEMY_COLOR))
-            self.boltAnimWalkLeft.blit(self.image, (0, 0))
+        # Приблизительное расстояние, на котором Enemy2 начнет атаковать
+        attack_range = 128
+
+        if player_distance < attack_range:
+            self.xvel = 0  # Останавливаем Enemy2
+            self.attack_animation()
         else:
-            self.image.fill(Color(ENEMY_COLOR))
-            self.boltAnimIdle.blit(self.image, (0, 0))
+            if self.direction:
+                self.xvel = 1
+                self.image.fill(Color(ENEMY_COLOR))
+                self.boltAnimWalkRight.blit(self.image, (0, 0))
+            else:
+                self.xvel = -1
+                self.image.fill(Color(ENEMY_COLOR))
+                self.boltAnimWalkLeft.blit(self.image, (0, 0))
+            self.rect.x += self.xvel
 
-        if abs(self.startX - self.rect.x) > self.maxLengthLeft:
-            self.xvel = -self.xvel
+            if abs(self.startX - self.rect.x) > self.maxLengthLeft:
+                self.direction = not self.direction
 
+    def attack_animation(self):
+        self.image.fill(Color(ENEMY_COLOR))
+        if self.player.direction:
+            self.boltAnimAttackLeft.blit(self.image, (0, 0))
+        else:
+            self.boltAnimAttackRight.blit(self.image, (0, 0))

@@ -52,10 +52,12 @@ class HealthBar():
 
 
 class Player(sprite.Sprite):
-    def __init__(self, x, y, username):
+    def __init__(self, x, y, screen, username="Убиыватель педиков"):
         sprite.Sprite.__init__(self)
 
         self.username = username
+
+        self.screen = screen
 
         self.xvel = 0  # скорость перемещения. 0 - стоять на месте
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
@@ -120,20 +122,23 @@ class Player(sprite.Sprite):
 
         boltAnim = []
         for anim in ANIMATION_ATTACK_RIGHT:
-            boltAnim.append((anim, 60))
+            boltAnim.append((anim, 120))
         self.boltAnimAttackRight = pyganim.PygAnimation(boltAnim)
         self.boltAnimAttackRight.play()
 
         boltAnim = []
         for anim in ANIMATION_ATTACK_LEFT:
-            boltAnim.append((anim, 60))
+            boltAnim.append((anim, 120))
         self.boltAnimAttackLeft = pyganim.PygAnimation(boltAnim)
         self.boltAnimAttackLeft.play()
+
+          # Минимальный интервал между ударами в миллисекундах
 
     def draw_health_bar(self, surface):
         self.health_bar.draw(surface)
 
     def update(self, left, right, up, platforms, attack, screen):
+        current_time = pygame.time.get_ticks()
         if up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
                 self.yvel = -JUMP_POWER
@@ -189,22 +194,33 @@ class Player(sprite.Sprite):
 
         self.rect.x += self.xvel  # переносим свои положение на xvel
 
-    def die(self, screen):
-        death_screen(screen)
-        #sys.exit()
+    def die(self):
+        death_screen(self.screen)
+        # sys.exit()
 
+    def recive_attack(self, damage):
+        self.health_bar.hp -= damage
+        if self.health_bar.hp <= 0:
+            self.die()
 
     def collide(self, xvel, yvel, platforms, on_moving_platform, attack, screen):
         for p in platforms:
-            if sprite.collide_rect(self, p) and not isinstance(p, Teleport):  # если есть пересечение платформы с игроком
+            if sprite.collide_rect(self, p) and not isinstance(p,
+                                                               Teleport):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
                     if attack:
-                        p.hp -= 2
+                        p.hp -= 3
                     else:
-                        damage = 2
+                        damage = 0.5
                         self.health_bar.hp -= damage
                         if self.health_bar.hp <= 0:
-                            self.die(screen)
+                            self.die()
+                if isinstance(p, Enemy2):
+                    if attack:
+                        p.hp -= 3
+                    damage = 1
+                    self.health_bar.hp -= damage
+
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
 
@@ -223,7 +239,7 @@ class Player(sprite.Sprite):
                 if isinstance(p, MovingPlatform):
                     self.on_moving_platform = True
                 elif isinstance(p, Lava):
-                    self.die(screen)
+                    self.die()
             if sprite.collide_rect(self, p) and isinstance(p, Teleport):
                 self.next_level = True
 
@@ -241,7 +257,7 @@ class AttackEffect(sprite.Sprite):
 
         boltAnim = []
         for anim in ANIMATION_ATTACK:
-            boltAnim.append((anim, 60))
+            boltAnim.append((anim, 120))
         self.boltAnimAttack = pyganim.PygAnimation(boltAnim)
         self.boltAnimAttack.play()
 
@@ -250,6 +266,7 @@ class AttackEffect(sprite.Sprite):
         self.rect.centery = self.player.rect.centery
 
     def update(self, attack, platforms, hero):
+        current_time = pygame.time.get_ticks()
         if attack:
             if self.player.direction:
                 self.rect.centerx = self.player.rect.centerx + 64
@@ -284,14 +301,8 @@ class AttackEffect(sprite.Sprite):
                     if attack:
                         p.hp -= 2
                         if p.hp <= 0:
-                            platforms.remove(p)
-                            p.kill()
+                            p.die(platforms)
                             hero.exp += 20
-                    else:
-                        damage = 7
-                        self.health_bar.hp -= damage
-                        if self.health_bar.hp <= 0:
-                            self.die()
 
     def draw(self, attack, surface):
         if attack:

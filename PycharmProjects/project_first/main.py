@@ -20,14 +20,15 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 icon = pygame.image.load('images/icon.png')
 pygame.display.set_icon(icon)
 
-#marat
 
-def load_level(level):
+# marat
+
+def load_level(level, screen):
     global entities, platforms, hero, monsters, moving_platform, status, attack_effect
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
 
-    hero = Player(1064, 2000, username = 'Дрочеслав')  # создаем героя по (x,y) координатам
+    hero = Player(1064, 2000, screen)  # создаем героя по (x,y) координатам
     status = StatusBar(800, 900, screen)
     attack_effect = AttackEffect(hero)
 
@@ -60,7 +61,7 @@ def load_level(level):
                 platforms.append(mn)
                 monsters.add(mn)
             elif col == 'g':
-                gm = Enemy2(x, y, 1, 0, 200, 0, hero, 150)
+                gm = Enemy2(x, y, 1, 0, 120, 0, hero, 150)
                 entities.add(gm)
                 platforms.append(gm)
                 monsters.add(gm)
@@ -93,15 +94,18 @@ def main():
     current_level = 0
     run = True
     username = 'АНОНИМУС'
-    reg = True
-    load_level(levels[current_level])
+    reg = False
+    load_level(levels[current_level], screen)
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(levels[current_level][0]) * PLATFORM_WIDTH
     total_level_height = len(levels[current_level][0]) * PLATFORM_HEIGHT
 
     camera = Camera(camera_configure, total_level_width, total_level_height)
-    while run:
+    current_time = pygame.time.get_ticks()
+    time_cooldown = 500
+    last_time = 0
 
+    while run:
 
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -136,7 +140,7 @@ def main():
                     attack = False
 
         bg.fill(Color(BACKGROUND_COLOR))
-        screen.blit(background_image, (0, 0)) 
+        screen.blit(background_image, (0, 0))
         screen.blit(overlay, (0, 0))
 
         if hero.next_level and current_level == 0:
@@ -158,7 +162,6 @@ def main():
         hero.draw_health_bar(screen)
         status.update(hero, clock)
         attack_effect.update(attack, platforms, hero)
-
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
