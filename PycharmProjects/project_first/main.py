@@ -93,7 +93,7 @@ def main():
     current_level = 0
     run = True
     username = 'АНОНИМУС'
-    reg = True
+    reg = False
     load_level(levels[current_level])
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(levels[current_level][0]) * PLATFORM_WIDTH
