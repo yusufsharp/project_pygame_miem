@@ -32,16 +32,6 @@ def load_level(level):
     attack_effect = AttackEffect(hero)
 
     monsters = pygame.sprite.Group()
-    mn = Enemy(2600, 1095, 2, 0, 100, 0, 30)
-    mn2 = Enemy(2300, 1095, 2, 0, 100, 0, 30)
-    golem1 = Enemy2(2000, 1888, 1, 0, 200, 0, hero, 150)
-    entities.add(mn)
-    entities.add(mn2)
-    entities.add(golem1)
-    platforms.append(mn)
-    platforms.append(mn2)
-    platforms.append(golem1)
-    monsters.add(mn, mn2, golem1)
 
     moving_platform = MovingPlatform(2064, 900, IMGS_PLATFORM['^'], 2064, 2904, 3)
     moving_platform.set_hero(hero)
@@ -52,7 +42,7 @@ def load_level(level):
     x = y = 0
     for row in level:
         for col in row:
-            if col != ' ' and col != 'L' and col != 'T':
+            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g':
                 pf = Platform(x, y, IMGS_PLATFORM[col])
                 entities.add(pf)
                 platforms.append(pf)
@@ -64,6 +54,16 @@ def load_level(level):
                 tp = Teleport(x, y, IMGS_PLATFORM[col])
                 entities.add(tp)
                 platforms.append(tp)
+            elif col == 'm':
+                mn = Enemy(x, y, 2, 0, 100, 0, 30)
+                entities.add(mn)
+                platforms.append(mn)
+                monsters.add(mn)
+            elif col == 'g':
+                gm = Enemy2(x, y, 1, 0, 200, 0, hero, 150)
+                entities.add(gm)
+                platforms.append(gm)
+                monsters.add(gm)
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0

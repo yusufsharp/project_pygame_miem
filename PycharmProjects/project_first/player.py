@@ -204,7 +204,7 @@ class Player(sprite.Sprite):
                         damage = 2
                         self.health_bar.hp -= damage
                         if self.health_bar.hp <= 0:
-                            sys.exit()
+                            self.die(screen)
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
 
