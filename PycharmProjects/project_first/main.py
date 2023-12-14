@@ -1,10 +1,12 @@
-,import pygame
+import pygame
 from enemies import *
 from blocks import *
 from settings import *
 from pygame.locals import *
 from player import Player
 from menu import menu_func, death_screen, stat_request
+from player import AttackEffect
+from player import Player, Coin, StatusBar
 
 pg.init()
 
@@ -18,19 +20,35 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 icon = pygame.image.load('images/icon.png')
 pygame.display.set_icon(icon)
 
-
+#marat
 
 def load_level(level):
-    global entities, platforms, hero, monsters, moving_platform
+    global entities, platforms, hero, monsters, moving_platform, status, attack_effect
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
 
-    hero = Player(1064, 2000)  # создаем героя по (x,y) координатам
+    hero = Player(1064, 2000, username = 'Дрочеслав')  # создаем героя по (x,y) координатам
+    status = StatusBar(800, 900, screen)
+    attack_effect = AttackEffect(hero)
+
+    monsters = pygame.sprite.Group()
+    mn = Enemy(2600, 1095, 2, 0, 100, 0, 30)
+    mn2 = Enemy(2300, 1095, 2, 0, 100, 0, 30)
+    golem1 = Enemy2(2000, 1888, 1, 0, 200, 0, hero, 150)
+    entities.add(mn)
+    entities.add(mn2)
+    entities.add(golem1)
+    platforms.append(mn)
+    platforms.append(mn2)
+    platforms.append(golem1)
+    monsters.add(mn, mn2, golem1)
 
     moving_platform = MovingPlatform(2064, 900, IMGS_PLATFORM['^'], 2064, 2904, 3)
     moving_platform.set_hero(hero)
     entities.add(hero, moving_platform)
+    entities.add(attack_effect)
     platforms.append(moving_platform)
+
     x = y = 0
     for row in level:
         for col in row:
@@ -49,12 +67,6 @@ def load_level(level):
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0
-
-    monsters = pygame.sprite.Group()
-    mn = Enemy(2600, 1095, 2, 0, 100, 0)
-    entities.add(mn)
-    platforms.append(mn)
-    monsters.add(mn)
 
 
 class Camera(object):
@@ -89,6 +101,8 @@ def main():
 
     camera = Camera(camera_configure, total_level_width, total_level_height)
     while run:
+
+
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         if not reg:
@@ -136,11 +150,15 @@ def main():
                 e.animate()
             if not isinstance(e, Player):  # Отрисовываем телепорт перед героем
                 screen.blit(e.image, camera.apply(e))
-        screen.blit(hero.image, camera.apply(hero))
-        hero.update(left, right, up, platforms, attack)
-        moving_platform.update()
 
+        screen.blit(hero.image, camera.apply(hero))
+        hero.update(left, right, up, platforms, attack, screen)
+        moving_platform.update()
         monsters.update(platforms)
+        hero.draw_health_bar(screen)
+        status.update(hero, clock)
+        attack_effect.update(attack, platforms, hero)
+
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
