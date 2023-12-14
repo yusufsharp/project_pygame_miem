@@ -22,7 +22,7 @@ pygame.display.set_icon(icon)
 entities = pygame.sprite.Group()
 platforms = []  # создаем героя по (x,y) координатам
 
-hero = Player(1064, 2000)  # создаем героя по (x,y) координатам
+hero = Player(1064, 2000, username= "Дрочеслав")  # создаем героя по (x,y) координатам
 status = StatusBar(800, 900, screen)
 attack_effect = AttackEffect(hero)
 entities.add(attack_effect)
@@ -95,7 +95,7 @@ def main():
     camera = Camera(camera_configure, total_level_width, total_level_height)
     while run:
 
-        attack_effect.update(attack, platforms)
+        attack_effect.update(attack, platforms, hero)
 
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -138,6 +138,7 @@ def main():
         for e in entities:
             if isinstance(e, Lava):
                 e.animate()
+
 
             screen.blit(e.image, camera.apply(e))
         moving_platform.update()

@@ -24,10 +24,6 @@ ANIMATION_ATTACK_LEFT = [f'assets_sprites/Attack-01/attack_l{i}.png' for i in ra
 
 pygame.init()
 
-headingfont = pygame.font.SysFont("Corbel", 40)
-regularfont = pygame.font.SysFont('Corbel', 25)
-smallerfont = pygame.font.SysFont('Corbel', 16)
-
 enemy = Enemy
 golem = Enemy2
 
@@ -53,10 +49,10 @@ class HealthBar():
 
 
 class Player(sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, username):
         sprite.Sprite.__init__(self)
 
-        self.username = "Buhs_hero"
+        self.username = username
 
         self.xvel = 0  # скорость перемещения. 0 - стоять на месте
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
@@ -250,7 +246,7 @@ class AttackEffect(sprite.Sprite):
         self.rect.centerx = self.player.rect.centerx
         self.rect.centery = self.player.rect.centery
 
-    def update(self, attack, platforms):
+    def update(self, attack, platforms, hero):
         if attack:
             if self.player.direction:
                 self.rect.centerx = self.player.rect.centerx + 64
@@ -264,9 +260,9 @@ class AttackEffect(sprite.Sprite):
             self.rect.centerx = -10000
             self.rect.centery = -10000
 
-        self.collide(platforms, attack)
+        self.collide(platforms, attack, hero)
 
-    def collide(self, platforms, attack):
+    def collide(self, platforms, attack, hero):
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
@@ -275,6 +271,7 @@ class AttackEffect(sprite.Sprite):
                         if p.hp <= 0:
                             platforms.remove(p)
                             p.kill()
+                            hero.exp += 10
                     else:
                         damage = 2
                         self.health_bar.hp -= damage
@@ -286,6 +283,7 @@ class AttackEffect(sprite.Sprite):
                         if p.hp <= 0:
                             platforms.remove(p)
                             p.kill()
+                            hero.exp += 20
                     else:
                         damage = 7
                         self.health_bar.hp -= damage
@@ -311,7 +309,7 @@ class StatusBar(sprite.Sprite):
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         time_text = self.font.render(f"TIME: {minutes:02}:{seconds:02}", True, (255, 255, 255))
-        fps_text = self.font.render(f"FPS: {int(clock.get_fps())}", True, (255, 255, 255))
+        fps_text = self.font.render(f"FPS: {int(FPS_CLOCK.get_fps())}", True, (255, 255, 255))
 
         # Draw the text on the status bar
         pygame.draw.rect(self.screen, (0, 0, 0), self.rect)
@@ -330,10 +328,10 @@ class Coin(sprite.Sprite):
         self.x = x
         self.y = y
 
-        self.image = Surface((16, 16))
+        self.image = Surface((32, 32))
         self.image.fill(Color(COLOR))
 
-        self.rect = Rect(x, y, 16, 16)
+        self.rect = Rect(x, y, 32, 32)
 
         boltAnim = []
         for anim in ANIMATION_COIN:
