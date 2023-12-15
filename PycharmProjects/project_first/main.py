@@ -149,7 +149,7 @@ def main():
         screen.blit(background_image, (0, 0))
         screen.blit(overlay, (0, 0))
 
-        if hero.next_level and current_level == 0:
+        if hero.next_level and current_level < len(levels):
             current_level += 1
             load_level(levels[current_level], screen)
             hero.next_level = False

@@ -196,9 +196,6 @@ class Player(sprite.Sprite):
         self.rect.x += self.xvel  # переносим свои положение на xvel
         self.collide(self.xvel, 0, platforms, attack, screen)
 
-    def die(self):
-        death_screen(self.screen)
-        # sys.exit()
 
     def die(self, screen):
         self.rect.x = 1064
