@@ -4,7 +4,7 @@ from blocks import *
 from settings import *
 from pygame.locals import *
 from player import Player
-from menu import menu_func, death_screen, stat_request, send_patch_request
+from menu import menu_func, death_screen, stat_request
 from player import AttackEffect
 from player import Player, Coin, StatusBar
 
@@ -108,7 +108,6 @@ def main():
         if not reg:
             reg, username = menu_func()
             print(f'ИМЯ ПОЛЬЗОВАТЕЛЯ: {username}')
-            send_patch_request(username, "health", 1000)
             print(stat_request(username))
         else:
             for e in pygame.event.get():

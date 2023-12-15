@@ -552,9 +552,11 @@ def death_screen(screen):
     duration = 500
     start_time = pg.time.get_ticks()
     respawn_rect = draw_rect(screen, 30, 70, 40, 10, clr=(255, 0, 0), border_width=8)
+    flag_return = False
     # Главный цикл игры
     while True:
         elapsed_time = pg.time.get_ticks() - start_time
+
         for some_event in pygame.event.get():
             if some_event.type == pygame.QUIT:
                 pygame.quit()
@@ -586,8 +588,10 @@ def death_screen(screen):
                 if some_event.type == pg.MOUSEBUTTONDOWN:
                     if respawn_rect.collidepoint(some_event.pos):
                         # какая то функция...
-                        pygame.quit()
-                        sys.exit()
+                        flag_return = True
+                        return
+        if flag_return:
+            return True
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)

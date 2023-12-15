@@ -4,7 +4,7 @@ from blocks import Platform, MovingPlatform, Lava, Teleport
 from enemies import *
 from settings import *
 import pygame
-from menu import death_screen
+from menu import send_post_request, death_screen
 
 MOVE_SPEED = 7
 ATTACK_WIDTH = 84
@@ -47,15 +47,17 @@ class HealthBar():
     def draw(self, surface):
         # Calculate health ratio
         ratio = self.hp / self.max_hp
-        pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h))
-        pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h))
+        pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h), border_radius=20)
+        pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h), border_radius=20)
 
 
 class Player(sprite.Sprite):
-    def __init__(self, x, y, username):
+    def __init__(self, x, y, screen, username):
         sprite.Sprite.__init__(self)
 
         self.username = username
+
+        self.screen = screen
 
         self.xvel = 0  # скорость перемещения. 0 - стоять на месте
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
@@ -63,6 +65,7 @@ class Player(sprite.Sprite):
         self.yvel = 0  # скорость вертикального перемещения
         self.onGround = False  # На земле ли я?
         self.next_level = False
+        self.restart = False
 
         self.image = Surface((WIDTH, HEIGHT))
         self.image.fill(Color(COLOR))
@@ -72,8 +75,13 @@ class Player(sprite.Sprite):
         self.on_moving_platform = False
 
         self.exp = 0
+        total_seconds = pygame.time.get_ticks() // 1000
+        self.total_second = pygame.time.get_ticks() // 1000
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        self.time = f'{minutes}:{seconds}'
 
-        self.health_bar = HealthBar(x - 900, y - 1950, 256, 45, max_hp=100)
+        self.health_bar = HealthBar(164, 50, 128, 24, max_hp=100)
 
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
         #        Анимация движения вправо
@@ -130,6 +138,8 @@ class Player(sprite.Sprite):
         self.boltAnimAttackLeft = pyganim.PygAnimation(boltAnim)
         self.boltAnimAttackLeft.play()
 
+        # Минимальный интервал между ударами в миллисекундах
+
     def draw_health_bar(self, surface):
         self.health_bar.draw(surface)
 
@@ -185,26 +195,42 @@ class Player(sprite.Sprite):
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms, self.on_moving_platform, attack, screen)
+        self.collide(0, self.yvel, platforms, attack, screen)
 
         self.rect.x += self.xvel  # переносим свои положение на xvel
+        self.collide(self.xvel, 0, platforms, attack, screen)
 
     def die(self, screen):
-        death_screen(screen)
-        #sys.exit()
+        self.rect.x = 1064
+        self.rect.y = 1850
+        self.restart = death_screen(screen)
+        # send_post_request(self.username, "password", self.exp, self.health_bar.hp, self.time)
 
+        # sys.exit()
 
-    def collide(self, xvel, yvel, platforms, on_moving_platform, attack, screen):
+    def recive_attack(self, damage):
+        self.health_bar.hp -= damage
+        if self.health_bar.hp <= 0:
+            self.die()
+
+    def collide(self, xvel, yvel, platforms, attack, screen):
         for p in platforms:
-            if sprite.collide_rect(self, p) and not isinstance(p, Teleport):  # если есть пересечение платформы с игроком
+            if sprite.collide_rect(self, p) and not isinstance(p,
+                                                               Teleport):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
                     if attack:
-                        p.hp -= 2
+                        p.hp -= 3
                     else:
-                        damage = 2
+                        damage = 0.5
                         self.health_bar.hp -= damage
                         if self.health_bar.hp <= 0:
                             self.die(screen)
+                if isinstance(p, Enemy2):
+                    if attack:
+                        p.hp -= 3
+                    damage = 1
+                    self.health_bar.hp -= damage
+
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
 
@@ -222,8 +248,11 @@ class Player(sprite.Sprite):
 
                 if isinstance(p, MovingPlatform):
                     self.on_moving_platform = True
-                elif isinstance(p, Lava):
+                else:
+                    self.on_moving_platform = False
+                if isinstance(p, Lava):
                     self.die(screen)
+
             if sprite.collide_rect(self, p) and isinstance(p, Teleport):
                 self.next_level = True
 
@@ -250,6 +279,7 @@ class AttackEffect(sprite.Sprite):
         self.rect.centery = self.player.rect.centery
 
     def update(self, attack, platforms, hero):
+        current_time = pygame.time.get_ticks()
         if attack:
             if self.player.direction:
                 self.rect.centerx = self.player.rect.centerx + 64
@@ -284,14 +314,8 @@ class AttackEffect(sprite.Sprite):
                     if attack:
                         p.hp -= 2
                         if p.hp <= 0:
-                            platforms.remove(p)
-                            p.kill()
+                            p.die(platforms)
                             hero.exp += 20
-                    else:
-                        damage = 7
-                        self.health_bar.hp -= damage
-                        if self.health_bar.hp <= 0:
-                            self.die()
 
     def draw(self, attack, surface):
         if attack:
