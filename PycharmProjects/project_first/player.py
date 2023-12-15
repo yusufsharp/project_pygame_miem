@@ -76,6 +76,7 @@ class Player(sprite.Sprite):
 
         self.exp = 0
         total_seconds = pygame.time.get_ticks() // 1000
+        self.total_second = pygame.time.get_ticks() // 1000
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         self.time = f'{minutes}:{seconds}'

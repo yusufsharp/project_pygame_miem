@@ -4,9 +4,10 @@ from blocks import *
 from settings import *
 from pygame.locals import *
 from player import Player
-from menu import menu_func, death_screen, stat_request
+from menu import *
 from player import AttackEffect
 from player import Player, Coin, StatusBar
+import threading
 
 pg.init()
 
@@ -108,8 +109,10 @@ def main():
     total_level_height = len(levels[current_level][0]) * PLATFORM_HEIGHT
 
     camera = Camera(camera_configure, total_level_width, total_level_height)
+    start_time = pygame.time.get_ticks()
     while run:
         if hero.restart:
+            start_time = pygame.time.get_ticks()
             load_level(levels[current_level], screen)
             hero.restart = False
         clock = pg.time.Clock()
@@ -118,6 +121,7 @@ def main():
             reg, username = menu_func()
             print(f'ИМЯ ПОЛЬЗОВАТЕЛЯ: {username}')
             print(stat_request(username))
+            start_time = pygame.time.get_ticks()
         else:
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
@@ -149,9 +153,18 @@ def main():
         screen.blit(overlay, (0, 0))
 
         if hero.next_level and current_level < len(levels):
+            animation_thread = threading.Thread(target=darken_screen(screen, duration=6000))
+            animation_thread.start()
+            send_patch_request(username, 'completion_time', (pygame.time.get_ticks() - start_time) // 1000)
+            send_patch_request(username, 'experience', 1)
+            send_patch_request(username, 'points', hero.exp)
+            animation_thread.join()
+            left = right = up = False
+            print(stat_request(username))
             current_level += 1
             load_level(levels[current_level], screen)
             hero.next_level = False
+
         camera.update(hero)
         for e in entities:
             if isinstance(e, Lava):
