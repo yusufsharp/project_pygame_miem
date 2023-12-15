@@ -52,7 +52,7 @@ class HealthBar():
 
 
 class Player(sprite.Sprite):
-    def __init__(self, x, y, screen, username):
+    def __init__(self, x, y, screen, username, exp):
         sprite.Sprite.__init__(self)
 
         self.username = username
@@ -74,7 +74,7 @@ class Player(sprite.Sprite):
         self.direction = True
         self.on_moving_platform = False
 
-        self.exp = 0
+        self.exp = exp
         total_seconds = pygame.time.get_ticks() // 1000
         minutes = total_seconds // 60
         seconds = total_seconds % 60
@@ -200,8 +200,6 @@ class Player(sprite.Sprite):
         self.collide(self.xvel, 0, platforms, attack, screen)
 
     def die(self, screen):
-        self.rect.x = 1064
-        self.rect.y = 1850
         self.restart = death_screen(screen)
         # send_post_request(self.username, "password", self.exp, self.health_bar.hp, self.time)
 
@@ -328,10 +326,10 @@ class StatusBar(sprite.Sprite):
         self.rect = Rect(x, y, 200, 100)  # You can adjust the size as needed
         self.screen = screen
 
-    def update(self, player, clock):
+    def update(self, player, time):
         username_text = self.font.render(f"USERNAME: {player.username}", True, (255, 255, 255))
         exp_text = self.font.render(f"EXP: {player.exp}", True, (255, 255, 255))
-        total_seconds = pygame.time.get_ticks() // 1000
+        total_seconds = time // 1000
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         time_text = self.font.render(f"TIME: {minutes:02}:{seconds:02}", True, (255, 255, 255))

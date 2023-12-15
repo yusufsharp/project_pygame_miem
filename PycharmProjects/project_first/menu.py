@@ -588,10 +588,7 @@ def death_screen(screen):
                 if some_event.type == pg.MOUSEBUTTONDOWN:
                     if respawn_rect.collidepoint(some_event.pos):
                         # какая то функция...
-                        flag_return = True
-                        return
-        if flag_return:
-            return True
+                        return True
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)
