@@ -29,7 +29,7 @@ def load_level(level, screen):
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
 
-    hero = Player(1064, 2000, screen)  # создаем героя по (x,y) координатам
+    hero = Player(1064, 1850, screen)  # создаем героя по (x,y) координатам
     status = StatusBar(800, 900, screen)
     attack_effect = AttackEffect(hero)
 
@@ -41,7 +41,7 @@ def load_level(level, screen):
     x = y = 0
     for row in level:
         for col in row:
-            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g' and col != 'p':
+            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g' and col != 'p' and col != 'n':
                 pf = Platform(x, y, IMGS_PLATFORM[col])
                 entities.add(pf)
                 platforms.append(pf)
@@ -53,8 +53,12 @@ def load_level(level, screen):
                 tp = Teleport(x, y, IMGS_PLATFORM[col])
                 entities.add(tp)
                 platforms.append(tp)
-            elif col == 'm':
-                mn = Enemy(x, y, 2, 0, 100, 0, 30)
+            elif col == 'm' or col == 'n':
+                if col == 'm':
+                    mn = Enemy(x, y, 2, 0, 100, 0, 30)
+                else:
+
+                    mn = Enemy(x, y, 2, 0, 140, 0, 30)
                 entities.add(mn)
                 platforms.append(mn)
                 monsters.add(mn)
@@ -64,7 +68,7 @@ def load_level(level, screen):
                 platforms.append(gm)
                 monsters.add(gm)
             elif col == 'p':
-                moving_platform = MovingPlatform(x, y, IMGS_PLATFORM['^'], x, x + 900, 4)
+                moving_platform = MovingPlatform(x, y, IMGS_PLATFORM['^'], x, x + 1500, 4)
                 moving_platform.set_hero(hero)
                 entities.add(hero, moving_platform)
                 platforms.append(moving_platform)
@@ -147,7 +151,7 @@ def main():
 
         if hero.next_level and current_level == 0:
             current_level += 1
-            load_level(levels[current_level])
+            load_level(levels[current_level], screen)
             hero.next_level = False
 
         camera.update(hero)

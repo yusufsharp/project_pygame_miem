@@ -223,7 +223,7 @@ class Player(sprite.Sprite):
                         damage = 0.5
                         self.health_bar.hp -= damage
                         if self.health_bar.hp <= 0:
-                            self.die()
+                            self.die(screen)
                 if isinstance(p, Enemy2):
                     if attack:
                         p.hp -= 3
@@ -247,12 +247,10 @@ class Player(sprite.Sprite):
 
                 if isinstance(p, MovingPlatform):
                     self.on_moving_platform = True
-                elif isinstance(p, Lava):
-                    self.die()
                 else:
                     self.on_moving_platform = False
                 if isinstance(p, Lava):
-                    self.die()
+                    self.die(screen)
 
             if sprite.collide_rect(self, p) and isinstance(p, Teleport):
                 self.next_level = True
