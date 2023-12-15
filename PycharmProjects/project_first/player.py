@@ -65,6 +65,7 @@ class Player(sprite.Sprite):
         self.yvel = 0  # скорость вертикального перемещения
         self.onGround = False  # На земле ли я?
         self.next_level = False
+        self.restart = False
 
         self.image = Surface((WIDTH, HEIGHT))
         self.image.fill(Color(COLOR))
@@ -122,17 +123,17 @@ class Player(sprite.Sprite):
 
         boltAnim = []
         for anim in ANIMATION_ATTACK_RIGHT:
-            boltAnim.append((anim, 120))
+            boltAnim.append((anim, 60))
         self.boltAnimAttackRight = pyganim.PygAnimation(boltAnim)
         self.boltAnimAttackRight.play()
 
         boltAnim = []
         for anim in ANIMATION_ATTACK_LEFT:
-            boltAnim.append((anim, 120))
+            boltAnim.append((anim, 60))
         self.boltAnimAttackLeft = pyganim.PygAnimation(boltAnim)
         self.boltAnimAttackLeft.play()
 
-          # Минимальный интервал между ударами в миллисекундах
+        # Минимальный интервал между ударами в миллисекундах
 
     def draw_health_bar(self, surface):
         self.health_bar.draw(surface)
@@ -190,12 +191,20 @@ class Player(sprite.Sprite):
 
         self.onGround = False  # Мы не знаем, когда мы на земле((
         self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms, self.on_moving_platform, attack, screen)
+        self.collide(0, self.yvel, platforms, attack, screen)
 
         self.rect.x += self.xvel  # переносим свои положение на xvel
+        self.collide(self.xvel, 0, platforms, attack, screen)
 
     def die(self):
         death_screen(self.screen)
+        # sys.exit()
+
+    def die(self, screen):
+        self.rect.x = 1064
+        self.rect.y = 1850
+        self.restart = death_screen(screen)
+
         # sys.exit()
 
     def recive_attack(self, damage):
@@ -203,7 +212,7 @@ class Player(sprite.Sprite):
         if self.health_bar.hp <= 0:
             self.die()
 
-    def collide(self, xvel, yvel, platforms, on_moving_platform, attack, screen):
+    def collide(self, xvel, yvel, platforms, attack, screen):
         for p in platforms:
             if sprite.collide_rect(self, p) and not isinstance(p,
                                                                Teleport):  # если есть пересечение платформы с игроком
@@ -240,6 +249,11 @@ class Player(sprite.Sprite):
                     self.on_moving_platform = True
                 elif isinstance(p, Lava):
                     self.die()
+                else:
+                    self.on_moving_platform = False
+                if isinstance(p, Lava):
+                    self.die()
+
             if sprite.collide_rect(self, p) and isinstance(p, Teleport):
                 self.next_level = True
 
@@ -257,7 +271,7 @@ class AttackEffect(sprite.Sprite):
 
         boltAnim = []
         for anim in ANIMATION_ATTACK:
-            boltAnim.append((anim, 120))
+            boltAnim.append((anim, 60))
         self.boltAnimAttack = pyganim.PygAnimation(boltAnim)
         self.boltAnimAttack.play()
 

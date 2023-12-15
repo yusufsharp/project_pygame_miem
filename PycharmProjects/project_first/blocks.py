@@ -26,14 +26,14 @@ class MovingPlatform(Platform):
     def set_hero(self, hero):
         self.hero = hero
 
-    def update(self):
+    def update(self, count_moving_platforms):
         self.rect.x += self.direction * self.speed
 
         if self.rect.right > self.end_x or self.rect.left < self.start_x:
             self.direction *= -1
+        if self.hero.on_moving_platform:
+            self.hero.rect.x += self.direction * (self.speed // count_moving_platforms)
 
-        if self.hero and self.hero.on_moving_platform:
-            self.hero.rect.x += self.direction * self.speed
 
 
 class Lava(Platform):
