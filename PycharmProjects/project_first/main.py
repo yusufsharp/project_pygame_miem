@@ -21,15 +21,14 @@ icon = pygame.image.load('images/icon.png')
 pygame.display.set_icon(icon)
 
 
-
 # marat
 
 def load_level(level, screen):
-    global entities, platforms, hero, monsters, moving_platforms, status, attack_effect
+    global entities, platforms, hero, monsters, moving_platforms, status, attack_effect, reg
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
 
-    hero = Player(1064, 1850, screen)  # создаем героя по (x,y) координатам
+    hero = Player(1064, 1700, screen, username='дрочеслав')  # создаем героя по (x,y) координатам
     status = StatusBar(800, 900, screen)
     attack_effect = AttackEffect(hero)
 
@@ -102,7 +101,7 @@ def main():
     current_level = 0
     run = True
     username = 'АНОНИМУС'
-    reg = True
+    reg = False
     load_level(levels[current_level], screen)
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(levels[current_level][0]) * PLATFORM_WIDTH
@@ -153,7 +152,6 @@ def main():
             current_level += 1
             load_level(levels[current_level], screen)
             hero.next_level = False
-
         camera.update(hero)
         for e in entities:
             if isinstance(e, Lava):
@@ -166,9 +164,9 @@ def main():
         for mvp in moving_platforms:
             mvp.update(len(moving_platforms))
         monsters.update(platforms)
-        hero.draw_health_bar(screen)
         status.update(hero, clock)
         attack_effect.update(attack, platforms, hero)
+        hero.draw_health_bar(screen)
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)

@@ -4,7 +4,7 @@ from blocks import Platform, MovingPlatform, Lava, Teleport
 from enemies import *
 from settings import *
 import pygame
-from menu import death_screen
+from menu import send_post_request, death_screen
 
 MOVE_SPEED = 7
 ATTACK_WIDTH = 84
@@ -47,12 +47,12 @@ class HealthBar():
     def draw(self, surface):
         # Calculate health ratio
         ratio = self.hp / self.max_hp
-        pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h))
-        pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h))
+        pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h), border_radius=20)
+        pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h), border_radius=20)
 
 
 class Player(sprite.Sprite):
-    def __init__(self, x, y, screen, username="Убиыватель педиков"):
+    def __init__(self, x, y, screen, username):
         sprite.Sprite.__init__(self)
 
         self.username = username
@@ -75,8 +75,12 @@ class Player(sprite.Sprite):
         self.on_moving_platform = False
 
         self.exp = 0
+        total_seconds = pygame.time.get_ticks() // 1000
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        self.time = f'{minutes}:{seconds}'
 
-        self.health_bar = HealthBar(x - 900, y - 1950, 256, 45, max_hp=100)
+        self.health_bar = HealthBar(164, 50, 128, 24, max_hp=100)
 
         self.image.set_colorkey(Color(COLOR))  # делаем фон прозрачным
         #        Анимация движения вправо
@@ -139,7 +143,6 @@ class Player(sprite.Sprite):
         self.health_bar.draw(surface)
 
     def update(self, left, right, up, platforms, attack, screen):
-        current_time = pygame.time.get_ticks()
         if up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
                 self.yvel = -JUMP_POWER
@@ -196,11 +199,11 @@ class Player(sprite.Sprite):
         self.rect.x += self.xvel  # переносим свои положение на xvel
         self.collide(self.xvel, 0, platforms, attack, screen)
 
-
     def die(self, screen):
         self.rect.x = 1064
         self.rect.y = 1850
         self.restart = death_screen(screen)
+        # send_post_request(self.username, "password", self.exp, self.health_bar.hp, self.time)
 
         # sys.exit()
 
