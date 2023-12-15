@@ -1,6 +1,6 @@
 import sys
 from pygame import *
-from blocks import Platform, MovingPlatform, Lava, Teleport
+from blocks import Platform, MovingPlatform, Lava, Teleport, Thorns
 from enemies import *
 from settings import *
 import pygame
@@ -142,7 +142,7 @@ class Player(sprite.Sprite):
     def draw_health_bar(self, surface):
         self.health_bar.draw(surface)
 
-    def update(self, left, right, up, platforms, attack, screen):
+    def update(self, left, right, up, platforms, attack, screen, username):
         if up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
                 self.yvel = -JUMP_POWER
@@ -251,6 +251,10 @@ class Player(sprite.Sprite):
                     self.on_moving_platform = False
                 if isinstance(p, Lava):
                     self.die(screen)
+                if isinstance(p, Thorns):
+                    self.health_bar.hp -= 10
+                    if self.health_bar.hp <= 0:
+                        self.die(screen)
 
             if sprite.collide_rect(self, p) and isinstance(p, Teleport):
                 self.next_level = True
@@ -365,12 +369,16 @@ class Coin(sprite.Sprite):
         self.AnimCoin = pyganim.PygAnimation(boltAnim)
         self.AnimCoin.play()
 
-    def update(self, hero):
-        self.collide(hero)
+    def update(self, platforms):
+        self.collide(platforms)
         self.image.set_colorkey(Color(COLOR))
+        self.image.fill(Color(COLOR))
         self.AnimCoin.blit(self.image, (0, 0))
 
-    def collide(self, hero):
-        if self.rect.colliderect(hero.rect):
-            self.kill()
-            hero.exp += 2
+    def collide(self, platforms):
+        for p in platforms:
+            if sprite.collide_rect(self, p):
+                if isinstance(self, p):
+                    self.remove(platforms)
+                    self.kill()
+                    Player.exp += 2

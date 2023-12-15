@@ -6,7 +6,7 @@ from pygame.locals import *
 from player import Player
 from menu import menu_func, death_screen, stat_request
 from player import AttackEffect
-from player import Player, Coin, StatusBar
+from player import Player, StatusBar
 
 pg.init()
 
@@ -28,7 +28,7 @@ def load_level(level, screen):
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
 
-    hero = Player(1064, 1700, screen, username='дрочеслав')  # создаем героя по (x,y) координатам
+    hero = Player(1064, 1700, screen, username="shpunka")  # создаем героя по (x,y) координатам
     status = StatusBar(800, 900, screen)
     attack_effect = AttackEffect(hero)
 
@@ -40,7 +40,7 @@ def load_level(level, screen):
     x = y = 0
     for row in level:
         for col in row:
-            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g' and col != 'p' and col != 'n':
+            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g' and col != 'p' and col != 'n' and col != 'S':
                 pf = Platform(x, y, IMGS_PLATFORM[col])
                 entities.add(pf)
                 platforms.append(pf)
@@ -72,6 +72,10 @@ def load_level(level, screen):
                 entities.add(hero, moving_platform)
                 platforms.append(moving_platform)
                 moving_platforms.append(moving_platform)
+            elif col == 'S':
+                torch = Thorns(x, y)
+                entities.add(torch)
+                platforms.append(torch)
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0
@@ -100,8 +104,8 @@ def camera_configure(camera, target_rect):
 def main():
     current_level = 0
     run = True
-    username = 'АНОНИМУС'
-    reg = False
+    username = "АНОНИМУС"
+    reg = True
     load_level(levels[current_level], screen)
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(levels[current_level][0]) * PLATFORM_WIDTH
@@ -160,7 +164,7 @@ def main():
                 screen.blit(e.image, camera.apply(e))
 
         screen.blit(hero.image, camera.apply(hero))
-        hero.update(left, right, up, platforms, attack, screen)
+        hero.update(left, right, up, platforms, attack, screen, username)
         for mvp in moving_platforms:
             mvp.update(len(moving_platforms))
         monsters.update(platforms)

@@ -1,11 +1,11 @@
 import pygame as pg
-from pygame import *
 import sys
 import requests
 from settings import *
 import math
 import json
 import random
+from player import *
 
 
 def send_post_request(username, password):
@@ -155,7 +155,7 @@ def menu_func():
         :rtype: tuple(bool, str)
         """
     reg = False  # отвечает за отображение всего меню
-    username = 'АНОНИМУС'
+    username = "АНОНИМУС"
     clock = pygame.time.Clock()  # фпс
     background_image = pg.image.load('images/Background.png')
     scaled_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))  # подгоняем изображение

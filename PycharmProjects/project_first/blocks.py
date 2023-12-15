@@ -35,7 +35,6 @@ class MovingPlatform(Platform):
             self.hero.rect.x += self.direction * (self.speed // count_moving_platforms)
 
 
-
 class Lava(Platform):
     def __init__(self, x, y, images):
         super().__init__(x, y, images[0])
@@ -53,9 +52,19 @@ class Lava(Platform):
             self.image_index = (self.image_index + 1) % len(self.images)
             self.image = self.images[self.image_index]
 
+
 class Teleport(Platform):
     def __init__(self, x, y, image_path):
         super().__init__(x, y, image_path)
         self.image = pg.image.load(image_path)
         self.image = pg.transform.scale(self.image, (PLATFORM_WIDTH, PLATFORM_HEIGHT))
         self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
+
+
+class Thorns(Platform):
+    def __init__(self, x, y, image_path="objects/torch.png"):
+        super().__init__(x, y, image_path="objects/torch.png")
+        self.image = pygame.transform.flip(self.image, False, True)
+        self.image = pygame.transform.scale(self.image, (32, 16))
+        self.image = image.load(image_path)
+        self.rect = Rect(x, y, 32, 16)
