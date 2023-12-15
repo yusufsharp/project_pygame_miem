@@ -1,12 +1,8 @@
-import pygame
-from enemies import *
-from blocks import *
-from settings import *
-from pygame.locals import *
-from player import Player
-from menu import menu_func, death_screen, stat_request
+from menu import *
 from player import AttackEffect
 from player import Player, StatusBar
+from blocks import *
+import threading
 
 pg.init()
 
@@ -23,12 +19,14 @@ pygame.display.set_icon(icon)
 
 # marat
 
-def load_level(level, screen):
+def load_level(level, screen, username, current_level):
     global entities, platforms, hero, monsters, moving_platforms, status, attack_effect, reg
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
-
-    hero = Player(1064, 1700, screen, username="shpunka")  # создаем героя по (x,y) координатам
+    exp = 0
+    if current_level != 0:
+        exp = stat_request(username)['points']
+    hero = Player(1064, 1700, screen, username, exp)  # создаем героя по (x,y) координатам
     status = StatusBar(800, 900, screen)
     attack_effect = AttackEffect(hero)
 
@@ -104,24 +102,23 @@ def camera_configure(camera, target_rect):
 def main():
     current_level = 0
     run = True
-    username = "АНОНИМУС"
-    reg = True
-    load_level(levels[current_level], screen)
+    username = 't'
+    reg = False
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(levels[current_level][0]) * PLATFORM_WIDTH
     total_level_height = len(levels[current_level][0]) * PLATFORM_HEIGHT
 
     camera = Camera(camera_configure, total_level_width, total_level_height)
+    start_time = pygame.time.get_ticks()
     while run:
-        if hero.restart:
-            load_level(levels[current_level], screen)
-            hero.restart = False
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         if not reg:
             reg, username = menu_func()
+            load_level(levels[current_level], screen, username, current_level)
             print(f'ИМЯ ПОЛЬЗОВАТЕЛЯ: {username}')
             print(stat_request(username))
+            start_time = pygame.time.get_ticks()
         else:
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
@@ -148,14 +145,29 @@ def main():
                 if e.type == KEYUP and e.key == K_SPACE:
                     attack = False
 
+        if hero.restart:
+            start_time = pygame.time.get_ticks()
+            load_level(levels[current_level], screen, username, current_level)
+            hero.restart = False
+            left = right = up = False
         bg.fill(Color(BACKGROUND_COLOR))
         screen.blit(background_image, (0, 0))
         screen.blit(overlay, (0, 0))
 
-        if hero.next_level and current_level == 0:
+        if hero.next_level and current_level < len(levels):
+            animation_thread = threading.Thread(target=darken_screen(screen, duration=6000))
+            animation_thread.start()
+            send_patch_request(username, 'completion_time', (pygame.time.get_ticks() - start_time) // 1000)
+            send_patch_request(username, 'experience', 1)
+            send_patch_request(username, 'points', hero.exp)
+            hero.exp = 0
+            animation_thread.join()
+            left = right = up = False
+            print(stat_request(username))
             current_level += 1
-            load_level(levels[current_level], screen)
+            load_level(levels[current_level], screen, username, current_level)
             hero.next_level = False
+
         camera.update(hero)
         for e in entities:
             if isinstance(e, Lava):
@@ -168,7 +180,7 @@ def main():
         for mvp in moving_platforms:
             mvp.update(len(moving_platforms))
         monsters.update(platforms)
-        status.update(hero, clock)
+        status.update(hero, pygame.time.get_ticks() - start_time)
         attack_effect.update(attack, platforms, hero)
         hero.draw_health_bar(screen)
 

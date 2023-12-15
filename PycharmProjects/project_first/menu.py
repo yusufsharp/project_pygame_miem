@@ -5,7 +5,6 @@ from settings import *
 import math
 import json
 import random
-from player import *
 
 
 def send_post_request(username, password):
@@ -161,7 +160,7 @@ def menu_func():
     scaled_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))  # подгоняем изображение
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     screen.blit(scaled_image, (0, 0))  # отображаем изображение
-    font_menu = pg.font.Font('fonts/thin_pixel-7.ttf', 36)
+    font_menu = pg.font.Font('fonts/thin_pixel-7.ttf', int(36*(WINDOW_WIDTH/1080)))
     animate(screen, 35, 20, 30, 10)  # анимация появления логин
     login_button_rect = draw_rect(screen, 35, 20, 30, 10)
     print_text_in_bar(screen, font_menu, 'Войти', login_button_rect, clr=(0, 0, 0))
@@ -235,13 +234,13 @@ def menu_reg_func(some_font, screen, username):
                 if name_window.collidepoint(reg_event.pos):
                     active_name = True
                     active_pass = False
-                    pygame.draw.rect(screen, (0, 255, 0), name_window, 2, border_radius=20)  # меняет цвет рамки логин
-                    pygame.draw.rect(screen, (0, 0, 0), pass_window, 2, border_radius=20)  # меняет цвет пароль
+                    draw_rect(screen, 30, 30, 40, 10, clr=(0, 255, 0), border_width=2, border=20)
+                    draw_rect(screen, 30, 45, 40, 10, clr=(0, 0, 0), border_width=2, border=20)
                 elif pass_window.collidepoint(reg_event.pos):
                     active_pass = True
                     active_name = False
-                    pygame.draw.rect(screen, (0, 255, 0), pass_window, 2, border_radius=20)
-                    pygame.draw.rect(screen, (0, 0, 0), name_window, 2, border_radius=20)
+                    draw_rect(screen, 30, 45, 40, 10, clr=(0, 255, 0), border_width=2, border=20)
+                    draw_rect(screen, 30, 30, 40, 10, clr=(0, 0, 0), border_width=2, border=20)
                 elif init_window.collidepoint(reg_event.pos):  # нажатие на кнопку играть
                     if text_name != '' and text_pass != '':  # не пустые рамки с текстом
                         pygame.draw.rect(screen, (255, 255, 255), init_window)  # отбеливание батона
@@ -276,7 +275,7 @@ def menu_reg_func(some_font, screen, username):
                     pygame.draw.rect(screen, (255, 255, 255), init_window, border_radius=20)  # делает зеленую рамку
                     print_text_in_bar(screen, some_font, "Играть", init_window, right_pos=2,
                                       bottom_pos=-6, clr=(0, 0, 0))
-                    pygame.draw.rect(screen, (0, 255, 0), init_window, 3, border_radius=20)
+                    draw_rect(screen, 45, 60, 10, 5, clr=(0, 255, 0), border=20, border_width=3)
         pygame.display.flip()
     return username
 
@@ -308,6 +307,8 @@ def draw_rect(screen, x, y, width, height, clr=(255, 255, 255), border=20, borde
     window_y = (WINDOW_HEIGHT * y) // 100
     window_width = (WINDOW_WIDTH * width) // 100
     window_height = (WINDOW_HEIGHT * height) // 100
+    border_width = int(border_width * WINDOW_WIDTH/1080)
+    border = int(border * WINDOW_WIDTH/1080)
     n_rect = pg.Rect(window_x, window_y, window_width, window_height)
     pygame.draw.rect(screen, clr, n_rect, border_radius=border, width=border_width)
     return n_rect
@@ -364,7 +365,7 @@ def text_bar_updating(screen, some_event, some_font, window, text, text_rect):
         :rtype: str
     """
     pygame.draw.rect(screen, (255, 255, 255), window)
-    pygame.draw.rect(screen, (0, 255, 0), window, 2, border_radius=20)
+    pygame.draw.rect(screen, (0, 255, 0), window, int(2*(WINDOW_WIDTH/1080)), border_radius=int(20*(WINDOW_WIDTH/1080)))
     if some_event.key == pygame.K_RETURN:
         text = ""
     elif some_event.key == pygame.K_BACKSPACE:
@@ -404,6 +405,8 @@ def animate(screen, x, y, width, height, clr=(255, 255, 255), border=20, border_
         :type duration: int
         :return: None
         """
+    border = int(border * (WINDOW_WIDTH/1080))
+    border_width = int(border_width * (WINDOW_WIDTH/1080))
     start_time = pg.time.get_ticks()
     while True:
         elapsed_time = pg.time.get_ticks() - start_time
@@ -449,8 +452,8 @@ def darken_screen(screen, duration=3000):
         if elapsed_time >= duration:
             break
         progress = math.sin((elapsed_time / duration) * math.pi / 2)  # нелинейное отображение синусом
-
-        some_font = pg.font.Font('fonts/thin_pixel-7.ttf', int(32 + progress * 404))  # изменяем размер шрифта
+        # изменяем размер шрифта
+        some_font = pg.font.Font('fonts/thin_pixel-7.ttf', int((32 + progress * 404) * (WINDOW_WIDTH/1080)))
         alpha = int(progress * 255)
         overlay.set_alpha(alpha)  # просвет на поверхность
         radius = progress * WINDOW_WIDTH
@@ -541,8 +544,10 @@ def death_screen(screen):
         :type screen: pygame.Surface
         :return: None
         """
-    some_font = pg.font.Font('fonts/thin_pixel-7.ttf', 320)
+    some_font = pg.font.Font('fonts/thin_pixel-7.ttf', int(320*(WINDOW_WIDTH/1080)))
     original_image = pygame.image.load("images/blood.png")
+    original_image = pygame.transform.scale(original_image, (int(original_image.get_width() * (WINDOW_WIDTH/1080)),
+                                                             int(original_image.get_height() * (WINDOW_WIDTH/1080))))
     image_rect = original_image.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
     duration = 500
     start_time = pg.time.get_ticks()
@@ -567,24 +572,23 @@ def death_screen(screen):
             scaled_image = pygame.transform.scale(original_image, (
                 int(image_rect.width * 0.5), int(image_rect.height * 0.5)))
             screen.fill((0, 0, 0))
-            screen.blit(scaled_image, scaled_image.get_rect(center=((WINDOW_WIDTH + random.randint(-50, 50)) // 2,
-                                                                    (WINDOW_HEIGHT + random.randint(-50, 50)) // 2)))
+            spread_int = int(50*(WINDOW_WIDTH/1080))
+            screen.blit(scaled_image, scaled_image.get_rect(center=((
+                                                    WINDOW_WIDTH + random.randint(-spread_int, spread_int)) // 2,
+                                                    (WINDOW_HEIGHT + random.randint(-spread_int, spread_int)) // 2)))
             print_text_in_bar(screen, some_font, "ТЫ МЕРТВ",
                               screen.get_rect(center=((WINDOW_WIDTH + random.randint(-10, 10)) // 2,
                                                       (WINDOW_HEIGHT + random.randint(-10, 10)) // 2)),
                               clr=(200, 200, 200))
 
             draw_rect(screen, 30, 70, 40, 10, clr=(255, 0, 0), border_width=8)
-            print_text_in_bar(screen, pg.font.Font('fonts/thin_pixel-7.ttf', 60),
+            print_text_in_bar(screen, pg.font.Font('fonts/thin_pixel-7.ttf', int(60*(WINDOW_WIDTH/1080))),
                               'Возродиться', respawn_rect, bottom_pos=-5)
             for some_event in pygame.event.get():
                 if some_event.type == pg.MOUSEBUTTONDOWN:
                     if respawn_rect.collidepoint(some_event.pos):
                         # какая то функция...
-                        flag_return = True
-                        return
-        if flag_return:
-            return True
+                        return True
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)
