@@ -38,7 +38,7 @@ def load_level(level, screen, username, current_level, exp_data=0):
     x = y = 0
     for row in level:
         for col in row:
-            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g' and col != 'p' and col != 'n' and col != 'S':
+            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g' and col != 'p' and col != 'n' and col != 'S' and col != 'E':
                 pf = Platform(x, y, IMGS_PLATFORM[col])
                 entities.add(pf)
                 platforms.append(pf)
@@ -74,6 +74,11 @@ def load_level(level, screen, username, current_level, exp_data=0):
                 torch = Thorns(x, y)
                 entities.add(torch)
                 platforms.append(torch)
+            elif col == 'E':
+                gate = Gate(x, y, IMGS_PLATFORM['E'])
+                entities.add(gate)
+                platforms.append(gate)
+
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0
