@@ -269,6 +269,8 @@ class Player(sprite.Sprite):
                         p.hp -= 3
                     damage = 1
                     self.health_bar.hp -= damage
+                    if self.health_bar.hp <= 0:
+                        self.die(screen)
 
                 if xvel > 0:  # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
@@ -389,7 +391,4 @@ class StatusBar(sprite.Sprite):
         self.screen.blit(exp_text, (self.rect.x + 10, self.rect.y + 40))
         self.screen.blit(time_text, (self.rect.x + 10, self.rect.y + 70))
         self.screen.blit(fps_text, (self.rect.x + 10, self.rect.y + 100))
-
-
-ANIMATION_COIN = [f'objects/Coin-{i}.png' for i in range(1, 8)]
 

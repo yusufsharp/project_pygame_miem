@@ -61,6 +61,13 @@ class Teleport(Platform):
         self.rect = Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
 
 
+class Gate(Platform):
+    def __init__(self, x, y, image_path):
+        super().__init__(x, y, image_path)
+        self.image = pg.image.load(image_path)
+        self.rect = Rect(x, y, 32, 64)
+
+
 class Thorns(Platform):
     def __init__(self, x, y, image_path="objects/torch.png"):
         super().__init__(x, y, image_path="objects/torch.png")
