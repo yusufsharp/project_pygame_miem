@@ -186,6 +186,7 @@ def menu_func():
                     login_rating_active = True
                     print("Нажата кнопка 'Рейтинг'")
                     menu_rating_func(font_menu, screen)
+                    menu_func()
         pygame.display.flip()
         clock.tick(60)
 
