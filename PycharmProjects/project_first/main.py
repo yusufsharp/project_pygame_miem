@@ -268,7 +268,7 @@ def main():
             animation_thread = threading.Thread(target=darken_screen(screen, duration=6000))
             animation_thread.start()
             send_patch_request(username, 'completion_time', (pygame.time.get_ticks() - start_time) // 1000)
-            send_patch_request(username, 'experience', 1)
+            send_patch_request(username, 'experience', current_level + 1)
             send_patch_request(username, 'points', hero.exp)
             animation_thread.join()
             left = right = up = False
@@ -276,6 +276,16 @@ def main():
             current_level += 1
             load_level(levels[current_level], screen, username, current_level, exp_data=hero.exp)
             hero.next_level = False
+
+        if hero.end_game:
+            if stat_dict['completion_time'] == 0:
+                time_value =  (pygame.time.get_ticks() - start_time) // 1000
+            else:
+                time_value = stat_dict['completion_time']
+            scores = int(1/time_value * 50000 + hero.exp * 2 + hero.health_bar.hp * 10)
+            its_time_to_go(screen, scores)
+            send_patch_request(username, final_score, scores)
+            sys.exit()
 
         camera.update(hero)
         for e in entities:

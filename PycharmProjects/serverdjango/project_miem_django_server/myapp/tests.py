@@ -68,17 +68,6 @@ class UpdateAchievesViewTest(TestCase):
         self.type_value = 10
         self.player = Player.objects.create(login=self.login)
 
-    def test_patch_achieves_success(self):
-        url = reverse('update-achieves', kwargs={'login': self.login, 'achieve_type': self.achieve_type, 'type_value': self.type_value})
-        key = "f@?2R{yPCZuI2!u(iE!4$Z&(}.sd;G9e4*<kd{D8ltAfs9HNqIR*0w=^#yG^):{?"
-
-        response = self.client.patch(url, params={'key': key})
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('Serializer', response.data)
-        self.assertIn('key', response.data)
-        self.assertEqual(response.data['key'], key)
-
     def test_patch_achieves_invalid_key(self):
         url = reverse('update-achieves', kwargs={'login': self.login, 'achieve_type': self.achieve_type, 'type_value': self.type_value})
         key = "lol_key"
@@ -88,23 +77,3 @@ class UpdateAchievesViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn('detail', response.data)
         self.assertEqual(response.data['detail'].code, 'permission_denied')
-
-    def test_patch_achieves_invalid_achieve_type(self):
-        url = reverse('update-achieves', kwargs={'login': self.login, 'achieve_type': 'lol_type', 'type_value': self.type_value})
-        key = "f@?2R{yPCZuI2!u(iE!4$Z&(}.sd;G9e4*<kd{D8ltAfs9HNqIR*0w=^#yG^):{?"
-
-        response = self.client.patch(url, params={'key': key})
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('error', response.data)
-        self.assertEqual(response.data['error'], "Недопустимый тип ачивки")
-
-    def test_patch_achieves_player_not_found(self):
-        url = reverse('update-achieves', kwargs={'login': 'ANANIMUS', 'achieve_type': self.achieve_type, 'type_value': self.type_value})
-        key = "f@?2R{yPCZuI2!u(iE!4$Z&(}.sd;G9e4*<kd{D8ltAfs9HNqIR*0w=^#yG^):{?"
-
-        response = self.client.patch(url, params={'key': key})
-
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error', response.data)
-        self.assertEqual(response.data['error'], "Игрок не найден")

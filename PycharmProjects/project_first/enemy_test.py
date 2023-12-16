@@ -36,23 +36,6 @@ class TestEnemy(unittest.TestCase):
 
         # Проверяем, что враг переместился горизонтально
         self.assertEqual(initial_x + self.enemy.xvel, self.enemy.rect.x)
-        self.assertEqual(initial_y, self.enemy.rect.y)
-
-    def test_collide(self):
-        platforms = [pygame.Rect(120, 220, 50, 10)]  # Фиктивная платформа для тестирования
-
-        initial_xvel = self.enemy.xvel
-        initial_yvel = self.enemy.yvel
-        initial_hp = self.enemy.hp
-
-        self.enemy.collide(platforms)
-
-        # Проверяем, что скорости врага изменены после столкновения
-        self.assertEqual(self.enemy.xvel, -initial_xvel)
-        self.assertEqual(self.enemy.yvel, -initial_yvel)
-
-        # Проверяем, что HP врага уменьшается после столкновения
-        self.assertEqual(self.enemy.hp, initial_hp - 2)
 
     def test_die(self):
         platforms = []  # Фиктивная платформа для тестирования

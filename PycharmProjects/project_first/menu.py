@@ -186,6 +186,11 @@ def menu_func():
                     login_rating_active = True
                     print("Нажата кнопка 'Рейтинг'")
                     menu_rating_func(font_menu, screen)
+                    screen.fill((255, 255, 255))
+                    username = menu_reg_func(font_menu, screen, username)
+                    darken_screen(screen)
+                    reg = True
+
         pygame.display.flip()
         clock.tick(60)
 
@@ -494,12 +499,17 @@ def menu_rating_func(some_font, screen):
     for elm in db:
         del elm['password']
         del elm['achieves']['id']
-    db = sorted(db, key=lambda item: item['achieves']['points'], reverse=True)
+        elm_final = elm['achieves'][final_score]
+        del elm['achieves'][final_score]
+        elm['achieves'][final_score] = elm_final
+    db = sorted(db, key=lambda item: item['achieves'][final_score], reverse=True)
     scroll = 0
     anima = True
     while menu_rating:
-
         screen.fill((255, 255, 255))
+        exit_rect = draw_rect(screen, 10, 10, 10, 5, clr=(255, 0, 0))
+        print_text_in_bar(screen, some_font, 'Выйти',
+                          exit_rect, clr=(255, 255, 255), bottom_pos=-8)
         for some_event in pygame.event.get():
             if some_event.type == QUIT:
                 pygame.quit()
@@ -509,8 +519,11 @@ def menu_rating_func(some_font, screen):
                     scroll -= 1
                 elif some_event.key == K_DOWN:
                     scroll += 1
+            elif some_event.type == pg.MOUSEBUTTONDOWN:
+                if exit_rect.collidepoint(some_event.pos):
+                    menu_rating = False
         scroll = abs(scroll % len(db))
-        headers = ['Name', 'Experience', 'Health', 'Points', 'Speedrun']
+        headers = ['Name', 'Level', 'Points', 'Speedrun', 'Final Score']
         i = 25
         for elm in headers:
             cell_achieve = draw_rect(screen, i, 10, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
@@ -532,6 +545,7 @@ def menu_rating_func(some_font, screen):
             j += 6
         anima = False
         pygame.display.flip()
+    return
 
 
 def death_screen(screen):
@@ -592,3 +606,43 @@ def death_screen(screen):
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)
+
+
+def its_time_to_go(screen, final_value):
+    """
+        Отображает затухающий оверлей с уменьшающимся текстом, когда приходит время закончить эту игру...
+
+        :param screen: Поверхность Pygame.
+        :type screen: pygame.Surface
+        :param final_value: Значение, которое будет отображено в сообщении перед выходом.
+        :type final_value: int
+        """
+    duration = 5000
+    overlay = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+    overlay.fill((0, 0, 0))
+    alpha = 0
+    start_time = pg.time.get_ticks()
+
+    while alpha <= 255:
+        elapsed_time = pg.time.get_ticks() - start_time
+        if elapsed_time >= duration:
+            break
+        progress = 1 - math.sin((elapsed_time / duration) * math.pi / 2)
+        some_font = pg.font.Font('fonts/thin_pixel-7.ttf', int((72 + progress * 404) * (WINDOW_WIDTH / 1080)))
+        alpha = int(progress * 255)
+        overlay.set_alpha(alpha)
+        radius = progress * WINDOW_WIDTH
+        alpha = int((1 - progress) * 255)
+        screen.blit(overlay, (0, 0))
+        pg.draw.circle(overlay, (200, 200, 200, alpha), (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), int(radius))
+        overlay_rect = overlay.get_rect()
+        print_text_in_bar(screen, some_font, f"ТЫ КОНЧИЛ СО СЧЕТОМ: {final_value}!", overlay_rect, clr=(255, 255, 255))
+
+        pg.display.flip()
+
+        for some_event in pg.event.get():
+            if some_event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+
+        pg.time.Clock().tick(60)
