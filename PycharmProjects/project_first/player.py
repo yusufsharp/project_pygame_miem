@@ -37,6 +37,14 @@ color_white = (255, 255, 255)
 
 class HealthBar():
     def __init__(self, x, y, w, h, max_hp):
+        """
+                Класс HealthBar для отображения здоровья игрока.
+
+                Параметры:
+                - x, y: координаты верхнего левого угла полосы здоровья
+                - w, h: ширина и высота полосы здоровья
+                - max_hp: максимальное количество здоровья игрока
+        """
         self.x = x
         self.y = y
         self.w = w
@@ -45,7 +53,12 @@ class HealthBar():
         self.max_hp = max_hp
 
     def draw(self, surface):
-        # Calculate health ratio
+        """
+                Отрисовка полосы здоровья на экране.
+
+                Параметры:
+                - surface: поверхность, на которой отрисовывается полоса здоровья
+        """
         ratio = self.hp / self.max_hp
         pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h), border_radius=20)
         pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h), border_radius=20)
@@ -54,6 +67,16 @@ class HealthBar():
 class Player(sprite.Sprite):
     def __init__(self, x, y, screen, username, exp):
         sprite.Sprite.__init__(self)
+
+        """
+                Конструктор класса Player для отображения игрока.
+
+                Параметры:
+                - x, y: начальные координаты игрока
+                - screen: поверхность, на которой отображается игра
+                - username: имя игрока
+                - exp: опыт игрока
+        """
 
         self.username = username
 
@@ -137,12 +160,25 @@ class Player(sprite.Sprite):
         self.boltAnimAttackLeft = pyganim.PygAnimation(boltAnim)
         self.boltAnimAttackLeft.play()
 
-        # Минимальный интервал между ударами в миллисекундах
-
     def draw_health_bar(self, surface):
+        """
+        Отрисовка шкалы здоровья.
+
+        :param surface: поверхность, на которой отображается шкала
+        """
         self.health_bar.draw(surface)
 
     def update(self, left, right, up, platforms, attack, screen, username):
+        """
+                Обновление состояния игрока.
+
+                Параметры:
+                - left, right, up: флаги направления движения и прыжка
+                - platforms: список платформ в уровне
+                - attack: флаг атаки игрока
+                - screen: поверхность, на которой отображается игра
+                - username: имя игрока
+        """
         if up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
                 self.yvel = -JUMP_POWER
@@ -200,17 +236,23 @@ class Player(sprite.Sprite):
         self.collide(self.xvel, 0, platforms, attack, screen)
 
     def die(self, screen):
+        """
+        При вызове персонаж умирает.
+
+        :param screen: экран
+        """
         self.restart = death_screen(screen)
-        # send_post_request(self.username, "password", self.exp, self.health_bar.hp, self.time)
-
-        # sys.exit()
-
-    def recive_attack(self, damage):
-        self.health_bar.hp -= damage
-        if self.health_bar.hp <= 0:
-            self.die()
 
     def collide(self, xvel, yvel, platforms, attack, screen):
+        """
+                Обработка столкновений игрока с платформами и врагами.
+
+                Параметры:
+                - xvel, yvel: скорости по горизонтали и вертикали
+                - platforms: список платформ в уровне
+                - attack: флаг атаки игрока
+                - screen: поверхность, на которой отображается игра
+        """
         for p in platforms:
             if sprite.collide_rect(self, p) and not isinstance(p,
                                                                Teleport):  # если есть пересечение платформы с игроком
@@ -327,7 +369,9 @@ class StatusBar(sprite.Sprite):
     def __init__(self, x, y, screen):
         sprite.Sprite.__init__(self)
         self.font = pygame.font.SysFont('Corbel', 25)
-        self.rect = Rect(x, y, 200, 100)  # You can adjust the size as needed
+        self.image = Surface((200, 200), pygame.SRCALPHA)
+        self.image.set_colorkey(Color(COLOR))
+        self.rect = Rect(x, y, 160, 130)
         self.screen = screen
 
     def update(self, player, time):
@@ -340,7 +384,7 @@ class StatusBar(sprite.Sprite):
         fps_text = self.font.render(f"FPS: {int(FPS_CLOCK.get_fps())}", True, (255, 255, 255))
 
         # Draw the text on the status bar
-        pygame.draw.rect(self.screen, (0, 0, 0), self.rect)
+        pygame.draw.rect(self.screen, (51, 0, 51), self.rect)
         self.screen.blit(username_text, (self.rect.x + 10, self.rect.y + 10))
         self.screen.blit(exp_text, (self.rect.x + 10, self.rect.y + 40))
         self.screen.blit(time_text, (self.rect.x + 10, self.rect.y + 70))
