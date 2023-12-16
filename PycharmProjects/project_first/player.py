@@ -39,25 +39,33 @@ class HealthBar():
     """
     Класс HealthBar представляет полосу здоровья для отображения состояния здоровья игрока.
 
-    Атрибуты:
-    - x, y: координаты верхнего левого угла полосы здоровья
-    - w, h: ширина и высота полосы здоровья
-    - hp: текущее количество здоровья игрока
-    - max_hp: максимальное количество здоровья игрока
+    Attributes:
+    - x: координата X верхнего левого угла полосы здоровья.
+    - y: координата Y верхнего левого угла полосы здоровья.
+    - w: ширина полосы здоровья.
+    - h: высота полосы здоровья.
+    - hp: текущее количество здоровья игрока.
+    - max_hp: максимальное количество здоровья игрока.
 
-    Методы:
-    - __init__(self, x, y, w, h, max_hp): конструктор класса
-    - draw(self, surface): отрисовка полосы здоровья на экране
+    Methods:
+    - __init__(self, x, y, w, h, max_hp): конструктор класса.
+    - draw(self, surface): отрисовка полосы здоровья на экране.
     """
     def __init__(self, x, y, w, h, max_hp):
         """
-                Класс HealthBar для отображения здоровья игрока.
+          Класс HealthBar для отображения здоровья игрока.
 
-                Параметры:
-                - x, y: координаты верхнего левого угла полосы здоровья
-                - w, h: ширина и высота полосы здоровья
-                - max_hp: максимальное количество здоровья игрока
-        """
+          :param x: Координата X верхнего левого угла полосы здоровья.
+          :param y: Координата Y верхнего левого угла полосы здоровья.
+          :param w: Ширина полосы здоровья.
+          :param h: Высота полосы здоровья.
+          :param max_hp: Максимальное количество здоровья игрока.
+          :type x: int
+          :type y: int
+          :type w: int
+          :type h: int
+          :type max_hp: int
+          """
         self.x = x
         self.y = y
         self.w = w
@@ -67,11 +75,11 @@ class HealthBar():
 
     def draw(self, surface):
         """
-                Отрисовка полосы здоровья на экране.
+            Отрисовка полосы здоровья на экране.
 
-                Параметры:
-                - surface: поверхность, на которой отрисовывается полоса здоровья
-        """
+            :param surface: Поверхность, на которой отрисовывается полоса здоровья.
+            :type surface: pygame.Surface
+            """
         ratio = self.hp / self.max_hp
         pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h), border_radius=20)
         pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h), border_radius=20)
@@ -79,44 +87,44 @@ class HealthBar():
 
 class Player(sprite.Sprite):
     """
-        Класс Player представляет игрового персонажа.
+    Класс Player представляет игрового персонажа.
 
-        Атрибуты:
-        - xvel: скорость перемещения по горизонтали
-        - startX: начальная позиция по горизонтали
-        - startY: начальная позиция по вертикали
-        - yvel: скорость перемещения по вертикали
-        - onGround: флаг, указывающий, находится ли персонаж на земле
-        - next_level: флаг, указывающий, что персонаж перешел на следующий уровень
-        - restart: флаг, указывающий, что нужно перезапустить игру
-        - image: изображение персонажа
-        - rect: прямоугольник, описывающий положение и размер персонажа на экране
-        - direction: направление персонажа (True - вправо, False - влево)
-        - on_moving_platform: флаг, указывающий, находится ли персонаж на подвижной платформе
-        - exp: опыт игрока
-        - time: время, проведенное в игре в формате 'минуты:секунды'
-        - health_bar: полоса здоровья персонажа
+    Attributes:
+    - xvel: скорость перемещения по горизонтали.
+    - startX: начальная позиция по горизонтали.
+    - startY: начальная позиция по вертикали.
+    - yvel: скорость перемещения по вертикали.
+    - onGround: флаг, указывающий, находится ли персонаж на земле.
+    - next_level: флаг, указывающий, что персонаж перешел на следующий уровень.
+    - restart: флаг, указывающий, что нужно перезапустить игру.
+    - image: изображение персонажа.
+    - rect: прямоугольник, описывающий положение и размер персонажа на экране.
+    - direction: направление персонажа (True - вправо, False - влево).
+    - on_moving_platform: флаг, указывающий, находится ли персонаж на подвижной платформе.
+    - exp: опыт игрока.
+    - time: время, проведенное в игре в формате 'минуты:секунды'.
+    - health_bar: полоса здоровья персонажа.
 
-        Методы:
-        - __init__(self, x, y, screen, username, exp): конструктор класса
-        - draw_health_bar(self, surface): отрисовка полосы здоровья на указанной поверхности
-        - update(self, left, right, up, platforms, attack, screen, username): обновление состояния персонажа
-        - die(self, screen): обработка смерти персонажа
-        - recive_attack(self, damage): обработка получения урона персонажем
-        - collide(self, xvel, yvel, platforms, attack, screen): обработка столкновений с платформами и объектами
+    Methods:
+    - __init__(self, x, y, screen, username, exp): конструктор класса.
+    - draw_health_bar(self, surface): отрисовка полосы здоровья на указанной поверхности.
+    - update(self, left, right, up, platforms, attack, screen, username): обновление состояния персонажа.
+    - die(self, screen): обработка смерти персонажа.
+    - recive_attack(self, damage): обработка получения урона персонажем.
+    - collide(self, xvel, yvel, platforms, attack, screen): обработка столкновений с платформами и объектами.
     """
     def __init__(self, x, y, screen, username, exp):
         sprite.Sprite.__init__(self)
 
         """
-                Конструктор класса Player для отображения игрока.
+           Конструктор класса Player для отображения игрока.
 
-                Параметры:
-                - x, y: начальные координаты игрока
-                - screen: поверхность, на которой отображается игра
-                - username: имя игрока
-                - exp: опыт игрока
-        """
+           Параметры:
+           - x, y: начальные координаты игрока.
+           - screen: поверхность, на которой отображается игра.
+           - username: имя игрока.
+           - exp: опыт игрока.
+           """
 
         self.username = username
 
@@ -204,20 +212,28 @@ class Player(sprite.Sprite):
         """
         Отрисовка шкалы здоровья.
 
-        :param surface: поверхность, на которой отображается шкала
+        :param surface: поверхность, на которой отображается шкала.
         """
         self.health_bar.draw(surface)
 
     def update(self, left, right, up, platforms, attack, screen, username):
         """
-                Обновление состояния игрока.
+        Обновляет состояние игрока в соответствии с переданными параметрами.
 
-                Параметры:
-                - left, right, up: флаги направления движения и прыжка
-                - platforms: список платформ в уровне
-                - attack: флаг атаки игрока
-                - screen: поверхность, на которой отображается игра
-                - username: имя игрока
+        :param left: Флаг направления движения влево.
+        :type left: bool
+        :param right: Флаг направления движения вправо.
+        :type right: bool
+        :param up: Флаг прыжка.
+        :type up: bool
+        :param platforms: Список платформ в уровне.
+        :type platforms: list
+        :param attack: Флаг атаки игрока.
+        :type attack: bool
+        :param screen: Поверхность, на которой отображается игра.
+        :type screen: pygame.Surface
+        :param username: Имя игрока.
+        :type username: str
         """
         if up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
@@ -277,22 +293,26 @@ class Player(sprite.Sprite):
 
     def die(self, screen):
         """
-        При вызове персонаж умирает.
+            Обрабатывает смерть персонажа и вызывает соответствующий экран смерти.
 
-        :param screen: экран
-        """
+            :param screen: Поверхность, на которой отображается игра.
+            """
         self.restart = death_screen(screen)
 
     def collide(self, xvel, yvel, platforms, attack, screen):
         """
-                Обработка столкновений игрока с платформами и врагами.
+           Обрабатывает столкновения игрока с платформами и врагами.
 
-                Параметры:
-                - xvel, yvel: скорости по горизонтали и вертикали
-                - platforms: список платформ в уровне
-                - attack: флаг атаки игрока
-                - screen: поверхность, на которой отображается игра
-        """
+           :param xvel: Скорость по горизонтали.
+           :type xvel: float
+           :param yvel: Скорость по вертикали.
+           :type yvel: float
+           :param platforms: Список платформ в уровне.
+           :type platforms: list
+           :param attack: Флаг атаки игрока.
+           :type attack: bool
+           :param screen: Поверхность, на которой отображается игра.
+           """
         for p in platforms:
             if sprite.collide_rect(self, p) and not isinstance(p,
                                                                Teleport):  # если есть пересечение платформы с игроком
@@ -344,29 +364,29 @@ class Player(sprite.Sprite):
 
 class AttackEffect(sprite.Sprite):
     """
-     Класс AttackEffect представляет эффект атаки игрока.
+        Класс AttackEffect представляет эффект атаки игрока.
 
-     Атрибуты:
-     - player: объект игрока, относительно которого отображается эффект
-     - image: изображение эффекта
-     - rect: прямоугольник, описывающий положение и размер эффекта на экране
-     - boltAnimAttack: анимация атаки
+        Atributes:
+        - player: объект игрока, относительно которого отображается эффект
+        - image: изображение эффекта
+        - rect: прямоугольник, описывающий положение и размер эффекта на экране
+        - boltAnimAttack: анимация эффекта атаки
 
-     Методы:
-     - __init__(self, player): конструктор класса
-     - update(self, attack, platforms, hero): обновление состояния эффекта
-     - collide(self, platforms, attack, hero): обработка столкновений эффекта с объектами
-     - draw(self, attack, surface): отрисовка эффекта на указанной поверхности
-     """
+        Metods:
+        - __init__(self, player): конструктор класса
+        - update(self, attack, platforms, hero): обновление состояния эффекта атаки
+        - collide(self, platforms, attack, hero): обработка столкновений эффекта атаки с объектами
+        - draw(self, attack, surface): отрисовка эффекта атаки на поверхности
+        """
+
     def __init__(self, player):
         super().__init__()
         """
-              Инициализация экземпляра класса AttackEffect.
+                Инициализация экземпляра класса AttackEffect.
 
-              Параметры:
-              - player: объект игрока, относительно которого отображается эффект
-        """
-
+                :param player: объект игрока, относительно которого отображается эффект
+                :type player: Player
+                """
         self.player = player
         self.image = Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
         self.image.set_colorkey(Color(COLOR))
@@ -386,13 +406,16 @@ class AttackEffect(sprite.Sprite):
 
     def update(self, attack, platforms, hero):
         """
-               Обновление состояния эффекта атаки.
+                Обновление состояния эффекта атаки.
 
-               Параметры:
-               - attack: флаг атаки
-               - platforms: список платформ в уровне
-               - hero: объект игрока
-               """
+                :param attack: флаг атаки
+                :type attack: bool
+                :param platforms: список платформ в уровне
+                :type platforms: List[Platform]
+                :param hero: объект игрока
+                :type hero: Player
+                :returns: None
+                """
         if attack:
             if self.player.direction:
                 self.rect.centerx = self.player.rect.centerx + 64
@@ -410,13 +433,16 @@ class AttackEffect(sprite.Sprite):
 
     def collide(self, platforms, attack, hero):
         """
-        Обработка столкновений эффекта атаки с объектами.
+            Обработка столкновений эффекта атаки с объектами.
 
-        Параметры:
-        - platforms: список платформ в уровне
-        - attack: флаг атаки
-        - hero: объект игрока
-        """
+            :param platforms: список платформ в уровне
+            :type platforms: List[Platform]
+            :param attack: флаг атаки
+            :type attack: bool
+            :param hero: объект игрока
+            :type hero: Player
+            :returns: None
+            """
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
@@ -440,12 +466,13 @@ class AttackEffect(sprite.Sprite):
 
     def draw(self, attack, surface):
         """
-            Отрисовка эффекта атаки на указанной поверхности.
+               Отрисовка эффекта атаки на указанной поверхности.
 
-            Параметры:
-            - attack: флаг атаки
-            - surface: поверхность для отрисовки
-            """
+               :param attack: флаг атаки
+               :type attack: bool
+               :param surface: поверхность для отрисовки
+               :returns: None
+               """
         if attack:
             surface.blit(self.image, self.rect.topleft)
 
@@ -454,7 +481,7 @@ class StatusBar(sprite.Sprite):
     """
     Класс StatusBar представляет статус-панель игрока.
 
-    Атрибуты:
+    Atributes:
     - x: координата X верхнего левого угла панели
     - y: координата Y верхнего левого угла панели
     - screen: объект экрана Pygame
@@ -462,19 +489,21 @@ class StatusBar(sprite.Sprite):
     - image: изображение панели с прозрачным фоном
     - rect: прямоугольник, описывающий положение и размер панели на экране
 
-    Методы:
+    Metods:
     - __init__(self, x, y, screen): конструктор класса
     - update(self, player, time): обновление содержимого панели
     """
     def __init__(self, x, y, screen):
         """
-          Инициализация экземпляра класса StatusBar.
+        Инициализация экземпляра класса StatusBar.
 
-          Параметры:
-          - x: координата X верхнего левого угла панели
-          - y: координата Y верхнего левого угла панели
-          - screen: объект экрана Pygame
-          """
+        :param x: координата X верхнего левого угла панели
+        :type x: int
+        :param y: координата Y верхнего левого угла панели
+        :type y: int
+        :param screen: объект экрана Pygame
+        :type screen: pygame.Surface
+        """
         sprite.Sprite.__init__(self)
         self.font = pygame.font.SysFont('Corbel', 25)
         self.image = Surface((200, 200), pygame.SRCALPHA)
@@ -484,12 +513,14 @@ class StatusBar(sprite.Sprite):
 
     def update(self, player, time):
         """
-          Обновление содержимого статус-панели.
+               Обновление содержимого статус-панели.
 
-          Параметры:
-          - player: объект игрока
-          - time: текущее время игры
-          """
+               :param player: объект игрока
+               :type player: Player
+               :param time: текущее время игры
+               :type time: int
+               :returns: None
+               """
         username_text = self.font.render(f"USERNAME: {player.username}", True, (255, 255, 255))
         exp_text = self.font.render(f"EXP: {player.exp}", True, (255, 255, 255))
         total_seconds = time // 1000

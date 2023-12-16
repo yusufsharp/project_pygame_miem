@@ -59,24 +59,18 @@ pygame.display.set_icon(icon)
 
 def load_level(level, screen, username, current_level, exp_data=0):
     """
-    Загружает уровень и создает соответствующие объекты, такие как платформы, монстры и герой.
+    Загружает уровень и создает соответствующие объекты.
 
-    Параметры:
-    - level: Список строк, представляющих уровень.
-    - screen: Экран Pygame.
-    - username: Имя пользователя.
-    - current_level: Текущий уровень.
-    - exp_data: Дополнительные данные опыта (по умолчанию 0).
-
-    Глобальные переменные:
-    - entities: Группа спрайтов для всех объектов на уровне.
-    - platforms: Список платформ на уровне.
-    - hero: Объект игрока.
-    - monsters: Группа монстров.
-    - moving_platforms: Список подвижных платформ.
-    - status: Объект статус-бара.
-    - attack_effect: Объект эффекта атаки.
-
+    :param level: Список строк, представляющих уровень.
+    :type level: list
+    :param screen: Экран Pygame.
+    :type screen: pygame.Surface
+    :param username: Имя пользователя.
+    :type username: str
+    :param current_level: Текущий уровень.
+    :type current_level: int
+    :param exp_data: Дополнительные данные опыта (по умолчанию 0).
+    :type exp_data: int
     """
     global entities, platforms, hero, monsters, moving_platforms, status, attack_effect, reg
     entities = pygame.sprite.Group()
@@ -144,46 +138,47 @@ def load_level(level, screen, username, current_level, exp_data=0):
 
 class Camera(object):
     """
-    Класс Camera представляет собой камеру для отслеживания и перемещения по игровому миру.
+     Класс Camera представляет собой камеру для отслеживания и перемещения по игровому миру.
 
-    Attributes:
-    - camera_func: Функция для обновления положения камеры.
-    - state: Прямоугольник, представляющий текущее состояние камеры (положение и размеры).
+     Attributes:
+     - camera_func: Функция для обновления положения камеры.
+     - state: Прямоугольник, представляющий текущее состояние камеры (положение и размеры).
 
-    Methods:
-    - apply(target): Применяет положение камеры к цели.
-    - update(target): Обновляет положение камеры относительно цели.
-    """
+     Methods:
+     - apply(target): Применяет положение камеры к цели.
+     - update(target): Обновляет положение камеры относительно цели.
+     """
     def __init__(self, camera_func, width, height):
         """
-        Инициализирует объект камеры.
+            Инициализирует объект камеры.
 
-        Параметры:
-        - camera_func: Функция для обновления положения камеры.
-        - width: Ширина камеры.
-        - height: Высота камеры.
-        """
+            :param camera_func: Функция для обновления положения камеры.
+            :type camera_func: function
+            :param width: Ширина камеры.
+            :type width: int
+            :param height: Высота камеры.
+            :type height: int
+            """
         self.camera_func = camera_func
         self.state = Rect(0, 0, width, height)
 
     def apply(self, target):
         """
-         Применяет положение камеры к цели.
+        Применяет положение камеры к цели.
 
-         Параметры:
-         - target: Объект, к которому применяется камера.
+        :param target: Объект, к которому применяется камера.
+        :type target: pygame.sprite.Sprite
 
-         Возвращает Rect: Прямоугольник с новыми координатами объекта после применения камеры.
-         """
+        """
         return target.rect.move(self.state.topleft)
 
     def update(self, target):
         """
-         Обновляет положение камеры относительно цели.
+              Обновляет положение камеры относительно цели.
 
-         Параметры:
-         - target: Объект, к которому привязана камера.
-         """
+              :param target: Объект, к которому привязана камера.
+              :type target: pygame.sprite.Sprite
+              """
         self.state = self.camera_func(self.state, target.rect)
 
 
@@ -191,11 +186,13 @@ def camera_configure(camera, target_rect):
     """
     Функция для конфигурации положения камеры относительно цели.
 
-    Параметры:
-    - camera: Прямоугольник, представляющий текущее состояние камеры (положение и размеры).
-    - target_rect: Прямоугольник, представляющий цель, к которой привязана камера.
+    :param camera: Прямоугольник, представляющий текущее состояние камеры (положение и размеры).
+    :type camera: pygame.Rect
+    :param target_rect: Прямоугольник, представляющий цель, к которой привязана камера.
+    :type target_rect: pygame.Rect
 
-    Возвращает Rect: Новый прямоугольник, представляющий положение камеры после конфигурации.
+    :return: Новый прямоугольник, представляющий положение камеры после конфигурации.
+    :rtype: pygame.Rect
     """
     l, t, _, _ = target_rect
     _, _, w, h = camera
