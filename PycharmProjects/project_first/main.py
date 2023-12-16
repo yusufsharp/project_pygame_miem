@@ -26,7 +26,7 @@ def load_level(level, screen, username, current_level):
     exp = 0
     if current_level != 0:
         exp = stat_request(username)['points']
-    hero = Player(1064, 1700, screen, username, exp)  # создаем героя по (x,y) координатам
+    hero = Player(1064, 1800, screen, username, exp)  # создаем героя по (x,y) координатам
     status = StatusBar(1700, 85, screen)
     attack_effect = AttackEffect(hero)
 

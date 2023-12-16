@@ -392,35 +392,3 @@ class StatusBar(sprite.Sprite):
 
 
 ANIMATION_COIN = [f'objects/Coin-{i}.png' for i in range(1, 8)]
-
-
-class Coin(sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.x = x
-        self.y = y
-
-        self.image = Surface((32, 32))
-        self.image.fill(Color(COLOR))
-
-        self.rect = Rect(x, y, 32, 32)
-
-        boltAnim = []
-        for anim in ANIMATION_COIN:
-            boltAnim.append((anim, 60))
-        self.AnimCoin = pyganim.PygAnimation(boltAnim)
-        self.AnimCoin.play()
-
-    def update(self, platforms):
-        self.collide(platforms)
-        self.image.set_colorkey(Color(COLOR))
-        self.image.fill(Color(COLOR))
-        self.AnimCoin.blit(self.image, (0, 0))
-
-    def collide(self, platforms):
-        for p in platforms:
-            if sprite.collide_rect(self, p):
-                if isinstance(self, p):
-                    self.remove(platforms)
-                    self.kill()
-                    Player.exp += 2
