@@ -494,12 +494,18 @@ def menu_rating_func(some_font, screen):
     for elm in db:
         del elm['password']
         del elm['achieves']['id']
+        health = elm['achieves']['health']
+        del elm['achieves']['health']
+        elm['achieves']['health'] = health
     db = sorted(db, key=lambda item: item['achieves']['points'], reverse=True)
+
     scroll = 0
     anima = True
     while menu_rating:
-
         screen.fill((255, 255, 255))
+        exit_rect = draw_rect(screen, 10, 10, 10, 5, clr=(255, 0, 0))
+        print_text_in_bar(screen, some_font, 'Выйти',
+                          exit_rect, clr=(255, 255, 255), bottom_pos=-8)
         for some_event in pygame.event.get():
             if some_event.type == QUIT:
                 pygame.quit()
@@ -509,8 +515,11 @@ def menu_rating_func(some_font, screen):
                     scroll -= 1
                 elif some_event.key == K_DOWN:
                     scroll += 1
+            elif some_event.type == pg.MOUSEBUTTONDOWN:
+                if exit_rect.collidepoint(some_event.pos):
+                    menu_rating = False
         scroll = abs(scroll % len(db))
-        headers = ['Name', 'Experience', 'Health', 'Points', 'Speedrun']
+        headers = ['Name', 'Level', 'Points', 'Speedrun', 'Final Score']
         i = 25
         for elm in headers:
             cell_achieve = draw_rect(screen, i, 10, 10, 5, border=5, border_width=2, clr=(0, 0, 0))
@@ -532,6 +541,7 @@ def menu_rating_func(some_font, screen):
             j += 6
         anima = False
         pygame.display.flip()
+    return
 
 
 def death_screen(screen):
