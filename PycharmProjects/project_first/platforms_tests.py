@@ -1,8 +1,11 @@
 import unittest
 import pygame
 from blocks import Platform, MovingPlatform, Lava, Teleport, Thorns
+
 PLATFORM_WIDTH = 32
 PLATFORM_HEIGHT = 32
+
+
 class TestMovingPlatform(unittest.TestCase):
 
     def setUp(self):
@@ -40,7 +43,6 @@ class TestLava(unittest.TestCase):
         self.lava = Lava(x, y, images)
 
 
-
 class TestTeleport(unittest.TestCase):
 
     def setUp(self):
@@ -54,6 +56,7 @@ class TestTeleport(unittest.TestCase):
         self.assertEqual(self.teleport.rect.y, 200)
         self.assertEqual(self.teleport.image.get_size(), (PLATFORM_WIDTH, PLATFORM_HEIGHT))
 
+
 class TestThorns(unittest.TestCase):
 
     def setUp(self):
@@ -66,6 +69,7 @@ class TestThorns(unittest.TestCase):
         self.assertEqual(self.thorns.rect.x, 100)
         self.assertEqual(self.thorns.rect.y, 200)
         self.assertEqual(self.thorns.image.get_size(), (32, 16))
+
 
 if __name__ == '__main__':
     unittest.main()

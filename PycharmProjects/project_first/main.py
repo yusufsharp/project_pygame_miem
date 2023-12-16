@@ -138,16 +138,16 @@ def load_level(level, screen, username, current_level, exp_data=0):
 
 class Camera(object):
     """
-     Класс Camera представляет собой камеру для отслеживания и перемещения по игровому миру.
+    Класс Camera представляет собой камеру для отслеживания и перемещения по игровому миру.
 
-     Attributes:
-     - camera_func: Функция для обновления положения камеры.
-     - state: Прямоугольник, представляющий текущее состояние камеры (положение и размеры).
+    Attributes:
+    - camera_func: Функция для обновления положения камеры.
+    :type camera_func: Callable
 
-     Methods:
-     - apply(target): Применяет положение камеры к цели.
-     - update(target): Обновляет положение камеры относительно цели.
-     """
+    - state: Прямоугольник, представляющий текущее состояние камеры (положение и размеры).
+    :type state: pygame.Rect
+    """
+
     def __init__(self, camera_func, width, height):
         """
             Инициализирует объект камеры.
@@ -279,10 +279,10 @@ def main():
 
         if hero.end_game:
             if stat_dict['completion_time'] == 0:
-                time_value =  (pygame.time.get_ticks() - start_time) // 1000
+                time_value = (pygame.time.get_ticks() - start_time) // 1000
             else:
                 time_value = stat_dict['completion_time']
-            scores = int(1/time_value * 50000 + hero.exp * 2 + hero.health_bar.hp * 10)
+            scores = int(1 / time_value * 50000 + hero.exp * 2 + hero.health_bar.hp * 10)
             its_time_to_go(screen, scores)
             send_patch_request(username, final_score, scores)
             sys.exit()

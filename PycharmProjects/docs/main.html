@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+    
+    <title>main</title>
+    <meta name="generator" content="pydoctor 23.9.1"> 
+        
+    </meta>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="apidocs.css" />
+    <link rel="stylesheet" type="text/css" href="extra.css" />
+</head>
+
+  <body>
+
+    
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          main/serializers/blocks/views/player/enemies/menu <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="search-help-button" title="Help" onclick="toggleSearchHelpText()"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div class="hint" id="search-help-box">
+          <p class="rst-last">
+      
+            Search bar offers the following options:
+            <ul>   
+                <li>
+                  <strong>Term presence.</strong> The below example searches for documents that 
+                    must contain “foo”, might contain “bar” and must not contain “baz”: <code>+foo bar -baz</code>
+                </li> 
+
+                <li>
+                  <strong>Wildcards.</strong> The below example searches for documents with words beginning with “foo”: <code>foo*</code>
+                </li> 
+
+                <li>
+                  <strong>Search in specific fields.</strong> The following search matches all objects 
+                  in "twisted.mail" that matches “search”: <code>+qname:twisted.mail.* +search</code>
+
+                  <p>
+                    Possible fields: 'name', 'qname' (fully qualified name), 'docstring', and 'kind'.
+                    Last two fields are only applicable if "search in docstrings" is enabled.
+                  </p>
+                </li>
+
+                <li>
+                  <strong>Fuzzy matches.</strong> The following search matches all documents 
+                  that have a word within 1 edit distance of “foo”: <code>foo~1</code>
+                </li>
+            </ul>
+
+          </p>
+        </div>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 8px;">
+          <p>Results provided by <a href="https://lunrjs.com">Lunr.js</a></p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="main.html" class="internal-link" title="This module">main</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="main.Camera.html" class="internal-link" title="main.Camera"><wbr></wbr>Camera</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#camera_configure" class="internal-link" title="main.camera_configure">camera<wbr></wbr>_configure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#load_level" class="internal-link" title="main.load_level">load<wbr></wbr>_level</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#main" class="internal-link" title="main.main">main</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#background_image" class="internal-link" title="main.background_image">background<wbr></wbr>_image</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#icon" class="internal-link" title="main.icon">icon</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#overlay" class="internal-link" title="main.overlay">overlay</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#screen" class="internal-link" title="main.screen">screen</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapseSideBar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <div id="main" class="">
+        
+
+        
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="main.html" class="internal-link">main</a></code></code></h1>
+          <div id="showPrivate">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          
+          <p></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Основной модуль игры.</p>
+<p>Содержит инициализацию, основной цикл и загрузку уровней.</p>
+<p>Модули:
+- menu: Модуль для работы с пользовательским меню.
+- player: Модуль, содержащий классы Player, StatusBar, AttackEffect и HealthBar.
+- blocks: Модуль с классами платформ и препятствий.
+- threading: Модуль для работы с многозадачностью.</p>
+<p>Глобальные переменные:
+- pg: Инициализация Pygame.
+- background_image: Задний фон игры.
+- overlay: Полупрозрачное затемнение для подложки.
+- screen: Экран Pygame.
+- icon: Иконка приложения.</p>
+<p>Функции:
+- load_level(level, screen, username, current_level, exp_data=0): Загружает уровень, создает персонажа, статус-бар и эффект атаки.
+- Camera: Класс для работы с камерой игры.
+- camera_configure(camera, target_rect): Конфигурирует положение камеры относительно персонажа.
+- main(): Основной цикл игры.</p>
+<p>Переменные:
+- current_level: Текущий уровень.
+- run: Флаг, указывающий на выполнение основного цикла.
+- username: Имя пользователя.
+- reg: Флаг, указывающий на необходимость регистрации пользователя.
+- attack, left, right, up: Флаги состояний клавиш управления.
+- total_level_width, total_level_height: Общая ширина и высота уровня.
+- camera: Экземпляр класса Camera для управления камерой.
+- start_time: Время начала уровня.
+- clock: Таймер для ограничения частоты кадров.</p>
+<p>Запуск игры:
+- Вызывает функцию main(), запускающую основной цикл игры.</p>
+</div>
+        </div>
+
+        <div id="splitTables">
+          <table class="children sortable" id="id16">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="main.Camera.html" class="internal-link" title="main.Camera"><wbr></wbr>Camera</a></code></td>
+    <td>Класс Camera представляет собой камеру для отслеживания и перемещения по игровому миру.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#camera_configure" class="internal-link" title="main.camera_configure">camera<wbr></wbr>_configure</a></code></td>
+    <td>Функция для конфигурации положения камеры относительно цели.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#load_level" class="internal-link" title="main.load_level">load<wbr></wbr>_level</a></code></td>
+    <td>Загружает уровень и создает соответствующие объекты.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#main" class="internal-link" title="main.main">main</a></code></td>
+    <td>Основная функция игры.</td>
+  </tr><tr class="variable">
+    
+    <td>Variable</td>
+    <td><code><a href="#background_image" class="internal-link" title="main.background_image">background<wbr></wbr>_image</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="variable">
+    
+    <td>Variable</td>
+    <td><code><a href="#icon" class="internal-link" title="main.icon">icon</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="variable">
+    
+    <td>Variable</td>
+    <td><code><a href="#overlay" class="internal-link" title="main.overlay">overlay</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="variable">
+    
+    <td>Variable</td>
+    <td><code><a href="#screen" class="internal-link" title="main.screen">screen</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="childList">
+          <div class="basefunction">
+  
+  
+  <a name="main.camera_configure">
+    
+  </a>
+  <a name="camera_configure">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">camera_configure</span><span class="function-signature">(camera, target_rect)</span>:
+    
+    <a class="headerLink" href="#camera_configure" title="main.camera_configure">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Функция для конфигурации положения камеры относительно цели.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">camera:</span>pygame.Rect</td><td class="fieldArgDesc">Прямоугольник, представляющий текущее состояние камеры (положение и размеры).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">target<wbr></wbr>_rect:</span>pygame.Rect</td><td class="fieldArgDesc">Прямоугольник, представляющий цель, к которой привязана камера.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer">pygame.Rect</td><td class="fieldArgDesc">Новый прямоугольник, представляющий положение камеры после конфигурации.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="main.load_level">
+    
+  </a>
+  <a name="load_level">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">load_level</span><span class="function-signature">(level, screen, username, current_level, exp_data=0)</span>:
+    
+    <a class="headerLink" href="#load_level" title="main.load_level">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Загружает уровень и создает соответствующие объекты.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">level:</span>list</td><td class="fieldArgDesc">Список строк, представляющих уровень.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">screen:</span>pygame.Surface</td><td class="fieldArgDesc">Экран Pygame.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">username:</span>str</td><td class="fieldArgDesc">Имя пользователя.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">current<wbr></wbr>_level:</span>int</td><td class="fieldArgDesc">Текущий уровень.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exp<wbr></wbr>_data:</span>int</td><td class="fieldArgDesc">Дополнительные данные опыта (по умолчанию 0).</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="main.main">
+    
+  </a>
+  <a name="main">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span> <span class="py-defname">main</span><span class="function-signature">()</span>:
+    
+    <a class="headerLink" href="#main" title="main.main">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Основная функция игры.</p>
+<p>Управляет основным циклом игры, обрабатывает события и обновляет экран.</p>
+</div>
+  </div>
+</div><div class="basevariable">
+  
+  
+  <a name="main.background_image">
+    
+  </a>
+  <a name="background_image">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">background_image</span> =
+    
+    <a class="headerLink" href="#background_image" title="main.background_image">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="basevariable">
+  
+  
+  <a name="main.icon">
+    
+  </a>
+  <a name="icon">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">icon</span> =
+    
+    <a class="headerLink" href="#icon" title="main.icon">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="basevariable">
+  
+  
+  <a name="main.overlay">
+    
+  </a>
+  <a name="overlay">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">overlay</span> =
+    
+    <a class="headerLink" href="#overlay" title="main.overlay">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="basevariable">
+  
+  
+  <a name="main.screen">
+    
+  </a>
+  <a name="screen">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">screen</span> =
+    
+    <a class="headerLink" href="#screen" title="main.screen">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </div>
+    </div>
+
+    <footer class="navbar navbar-default">
+
+  
+  <div class="container">
+    <a href="index.html">API Documentation</a> for main/serializers/blocks/views/player/enemies/menu,
+  generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
+    23.9.1 at 2023-12-16 09:09:44.
+  </div>
+
+  <!-- Search related scripts needs to be loaded at the end of HTML 
+    parsing not to introduce overhead and display HTML data asap -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

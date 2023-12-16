@@ -11,6 +11,7 @@ class PlayerAchievesSerializer(serializers.ModelSerializer):
     :type Meta: class
     :raises ValidationError: Если данные не соответствуют ожидаемому формату.
     """
+
     class Meta:
         model = PlayerAchieves
         fields = '__all__'

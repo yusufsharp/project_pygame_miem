@@ -6,15 +6,16 @@ from settings import *
 
 class Platform(sprite.Sprite):
     """
-    Класс, представляющий статичную платформу в игре.
+     Класс, представляющий статичную платформу в игре.
 
-    Attributes:
-    - image: изображение платформы.
-    - rect: прямоугольник, определяющий положение и размеры платформы.
+     Attributes:
+     - image: Изображение платформы.
+     :type image: pygame.Surface
 
-    Methods:
-    - __init__: инициализация объекта платформы.
-    """
+     - rect: Прямоугольник, определяющий положение и размеры платформы.
+     :type rect: pygame.Rect
+     """
+
     def __init__(self, x, y, image_path):
         """
         Инициализация объекта платформы.
@@ -34,19 +35,25 @@ class Platform(sprite.Sprite):
 
 class MovingPlatform(Platform):
     """
-        Класс, представляющий движущуюся платформу в игре.
+     Класс, представляющий движущуюся платформу в игре.
 
-        Attributes:
-        - start_x, end_x: начальная и конечная координаты движения платформы по горизонтали.
-        - speed: скорость движения платформы.
-        - direction: направление движения (1 - вправо, -1 - влево).
-        - hero: объект героя.
+     Attributes:
+     - start_x: Начальная координата по горизонтали.
+     :type start_x: int
 
-        Methods:
-        - __init__: инициализация объекта движущейся платформы.
-        - set_hero: установка объекта героя на платформу.
-        - update: обновление состояния платформы.
-        """
+     - end_x: Конечная координата по горизонтали.
+     :type end_x: int
+
+     - speed: Скорость движения платформы.
+     :type speed: int
+
+     - direction: Направление движения (1 - вправо, -1 - влево).
+     :type direction: int
+
+     - hero: Объект героя.
+     :type hero: Player
+     """
+
     def __init__(self, x, y, image_path, start_x, end_x, speed):
         """
           Инициализация объекта движущейся платформы.
@@ -104,18 +111,22 @@ class MovingPlatform(Platform):
 
 class Lava(Platform):
     """
-    Класс, представляющий лаву в игре.
+     Класс, представляющий лаву в игре.
 
-    Attributes:
-    - images: список изображений для анимации лавы.
-    - image_index: индекс текущего изображения.
-    - animation_speed: скорость анимации.
-    - animation_timer: таймер анимации.
+     Attributes:
+     - images: Список изображений для анимации лавы.
+     :type images: List[pygame.Surface]
 
-    Methods:
-    - __init__: инициализация объекта лавы.
-    - animate: анимация лавы.
-    """
+     - image_index: Индекс текущего изображения.
+     :type image_index: int
+
+     - animation_speed: Скорость анимации.
+     :type animation_speed: int
+
+     - animation_timer: Таймер анимации.
+     :type animation_timer: float
+     """
+
     def __init__(self, x, y, images):
         """
          Инициализация объекта лавы.
@@ -153,6 +164,7 @@ class Teleport(Platform):
      Methods:
      - __init__: инициализация объекта телепорта.
      """
+
     def __init__(self, x, y, image_path):
         """
         Инициализация объекта телепорта.
@@ -177,6 +189,7 @@ class Gate(Platform):
     Methods:
     - __init__: инициализация объекта ворот.
     """
+
     def __init__(self, x, y, image_path):
         """
            Инициализация объекта ворот.

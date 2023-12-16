@@ -4,6 +4,7 @@ import sys
 from settings import *
 from menu import *
 
+
 # Используйте фикстуру pytest для создания окна Pygame
 @pytest.fixture
 def pygame_window():
@@ -21,7 +22,6 @@ def test_draw_rect_color_true(pygame_window):
 
 
 def test_draw_rect_color(pygame_window):
-
     draw_rect(pygame_window, 5, 10, 5, 10, clr=(80, 81, 82))
     pygame.display.flip()
     color_at_rect = pygame_window.get_at((int(WINDOW_WIDTH * (6 / 100)), int(WINDOW_HEIGHT * (11 / 100))))[:3]

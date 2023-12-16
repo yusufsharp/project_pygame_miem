@@ -14,18 +14,38 @@ class Enemy(sprite.Sprite):
     """
     Класс, представляющий простого врага (Enemy) в игре.
 
-    Atributes:
-    - rect (Rect): прямоугольник, определяющий положение врага на экране.
-    - image (Surface): изображение врага.
-    - startX (int): начальная координата по горизонтали.
-    - startY (int): начальная координата по вертикали.
-    - maxLengthLeft (int): максимальное расстояние, которое враг может пройти в одну сторону по горизонтали.
-    - maxLengthUp (int): максимальное расстояние, которое враг может пройти в одну сторону по вертикали.
-    - xvel (int): начальная скорость врага по горизонтали.
-    - yvel (int): начальная скорость врага по вертикали.
-    - boltAnim (PygAnimation): анимация врага.
-    - hp (int): количество очков здоровья врага.
+    Attributes:
+    - rect: Прямоугольник, определяющий положение врага на экране.
+    :type rect: pygame.Rect
+
+    - image: Изображение врага.
+    :type image: pygame.Surface
+
+    - startX: Начальная координата по горизонтали.
+    :type startX: int
+
+    - startY: Начальная координата по вертикали.
+    :type startY: int
+
+    - maxLengthLeft: Максимальное расстояние, которое враг может пройти в одну сторону по горизонтали.
+    :type maxLengthLeft: int
+
+    - maxLengthUp: Максимальное расстояние, которое враг может пройти в одну сторону по вертикали.
+    :type maxLengthUp: int
+
+    - xvel: Начальная скорость врага по горизонтали.
+    :type xvel: int
+
+    - yvel: Начальная скорость врага по вертикали.
+    :type yvel: int
+
+    - boltAnim: Анимация врага.
+    :type boltAnim: pyganim.PygAnimation
+
+    - hp: Количество очков здоровья врага.
+    :type hp: int
     """
+
     def __init__(self, x, y, left, up, maxLengthLeft, maxLengthUp, hp):
         """
                Инициализирует объект врага.
@@ -118,7 +138,76 @@ ANIMATION_GOLEM_DIE = [f'assets_sprites/enemy2/en2_d/en2_die{i}.png' for i in ra
 
 
 class Enemy2(sprite.Sprite):
+    """
+        Класс, представляющий продвинутого врага (Enemy2) в игре.
 
+        Attributes:
+        - image: Изображение врага.
+        :type image: pygame.Surface
+
+        - rect: Прямоугольник, определяющий положение врага на экране.
+        :type rect: pygame.Rect
+
+        - startX: Начальная координата по горизонтали.
+        :type startX: int
+
+        - startY: Начальная координата по вертикали.
+        :type startY: int
+
+        - maxLengthLeft: Максимальное расстояние по горизонтали, которое враг может пройти в одну сторону.
+        :type maxLengthLeft: int
+
+        - maxLengthUp: Максимальное расстояние по вертикали, которое враг может пройти в одну сторону.
+        :type maxLengthUp: int
+
+        - xvel: Начальная скорость врага по горизонтали.
+        :type xvel: int
+
+        - yvel: Начальная скорость врага по вертикали.
+        :type yvel: int
+
+        - direction: Направление врага (True - вправо, False - влево).
+        :type direction: bool
+
+        - hp: Количество очков здоровья врага.
+        :type hp: int
+
+        - start_time: Время начала движения врага.
+        :type start_time: float
+
+        - elapsed_time: Прошедшее время.
+        :type elapsed_time: float
+
+        - paused: Флаг паузы.
+        :type paused: bool
+
+        - player: Объект игрока.
+        :type player: Player
+
+        - attack_range: Радиус, в пределах которого враг начинает атаковать.
+        :type attack_range: int
+
+        - attack_distance: Дистанция атаки.
+        :type attack_distance: int
+
+        - boltAnimDie: Анимация смерти врага.
+        :type boltAnimDie: pyganim.PygAnimation
+
+        - boltAnimIdle: Анимация покоя врага.
+        :type boltAnimIdle: pyganim.PygAnimation
+
+        - boltAnimWalkLeft: Анимация движения влево.
+        :type boltAnimWalkLeft: pyganim.PygAnimation
+
+        - boltAnimWalkRight: Анимация движения вправо.
+        :type boltAnimWalkRight: pyganim.PygAnimation
+
+        - boltAnimAttackLeft: Анимация атаки влево.
+        :type boltAnimAttackLeft: pyganim.PygAnimation
+
+        - boltAnimAttackRight: Анимация атаки вправо.
+        :type boltAnimAttackRight: pyganim.PygAnimation
+        """
 
     def __init__(self, x, y, left, up, maxLengthLeft, maxLengthUp, player, hp):
         """

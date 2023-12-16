@@ -88,6 +88,7 @@ class ItemAPIView(APIView):
             return Response({'data': serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UpdateAchievesView(APIView):
     """
     API-представление для обновления ачивок игрока.
@@ -101,6 +102,7 @@ class UpdateAchievesView(APIView):
     :param type_value: Значение, на которое нужно обновить ачивку.
     :type type_value: str
         """
+
     def patch(self, request, login, achieve_type, type_value):
         """
         Обработчик PATCH-запроса для обновления ачивок игрока.

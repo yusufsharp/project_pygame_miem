@@ -2,6 +2,7 @@ import unittest
 import pygame
 from enemies import Enemy
 
+
 class TestEnemy(unittest.TestCase):
     def setUp(self):
         pygame.init()
@@ -48,6 +49,7 @@ class TestEnemy(unittest.TestCase):
 
     def tearDown(self):
         pygame.quit()
+
 
 if __name__ == '__main__':
     unittest.main()

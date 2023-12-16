@@ -37,20 +37,24 @@ color_white = (255, 255, 255)
 
 class HealthBar():
     """
-    Класс HealthBar представляет полосу здоровья для отображения состояния здоровья игрока.
+        Класс HealthBar представляет полосу здоровья для отображения состояния здоровья игрока.
 
-    Attributes:
-    - x: координата X верхнего левого угла полосы здоровья.
-    - y: координата Y верхнего левого угла полосы здоровья.
-    - w: ширина полосы здоровья.
-    - h: высота полосы здоровья.
-    - hp: текущее количество здоровья игрока.
-    - max_hp: максимальное количество здоровья игрока.
+        :param x: Координата X верхнего левого угла полосы здоровья.
+        :type x: int
+        :param y: Координата Y верхнего левого угла полосы здоровья.
+        :type y: int
+        :param w: Ширина полосы здоровья.
+        :type w: int
+        :param h: Высота полосы здоровья.
+        :type h: int
+        :param max_hp: Максимальное количество здоровья игрока.
+        :type max_hp: int
 
-    Methods:
-    - __init__(self, x, y, w, h, max_hp): конструктор класса.
-    - draw(self, surface): отрисовка полосы здоровья на экране.
-    """
+        Методы:
+        - __init__(self, x, y, w, h, max_hp): Конструктор класса.
+        - draw(self, surface): Отрисовка полосы здоровья на экране.
+        """
+
     def __init__(self, x, y, w, h, max_hp):
         """
           Класс HealthBar для отображения здоровья игрока.
@@ -89,21 +93,47 @@ class Player(sprite.Sprite):
     """
     Класс Player представляет игрового персонажа.
 
-    Attributes:
-    - xvel: скорость перемещения по горизонтали.
-    - startX: начальная позиция по горизонтали.
-    - startY: начальная позиция по вертикали.
-    - yvel: скорость перемещения по вертикали.
-    - onGround: флаг, указывающий, находится ли персонаж на земле.
-    - next_level: флаг, указывающий, что персонаж перешел на следующий уровень.
-    - restart: флаг, указывающий, что нужно перезапустить игру.
-    - image: изображение персонажа.
-    - rect: прямоугольник, описывающий положение и размер персонажа на экране.
-    - direction: направление персонажа (True - вправо, False - влево).
-    - on_moving_platform: флаг, указывающий, находится ли персонаж на подвижной платформе.
-    - exp: опыт игрока.
-    - time: время, проведенное в игре в формате 'минуты:секунды'.
-    - health_bar: полоса здоровья персонажа.
+   :param xvel: Скорость перемещения по горизонтали.
+    :type xvel: float
+
+    :param startX: Начальная позиция по горизонтали.
+    :type startX: float
+
+    :param startY: Начальная позиция по вертикали.
+    :type startY: float
+
+    :param yvel: Скорость перемещения по вертикали.
+    :type yvel: float
+
+    :param onGround: Флаг, указывающий, находится ли персонаж на земле.
+    :type onGround: bool
+
+    :param next_level: Флаг, указывающий, что персонаж перешел на следующий уровень.
+    :type next_level: bool
+
+    :param restart: Флаг, указывающий, что нужно перезапустить игру.
+    :type restart: bool
+
+    :param image: Изображение персонажа.
+    :type image: Image
+
+    :param rect: Прямоугольник, описывающий положение и размер персонажа на экране.
+    :type rect: Rect
+
+    :param direction: Направление персонажа (True - вправо, False - влево).
+    :type direction: bool
+
+    :param on_moving_platform: Флаг, указывающий, находится ли персонаж на подвижной платформе.
+    :type on_moving_platform: bool
+
+    :param exp: Опыт игрока.
+    :type exp: int
+
+    :param time: Время, проведенное в игре в формате 'минуты:секунды'.
+    :type time: str
+
+    :param health_bar: Полоса здоровья персонажа.
+    :type health_bar: HealthBar
 
     Methods:
     - __init__(self, x, y, screen, username, exp): конструктор класса.
@@ -113,17 +143,28 @@ class Player(sprite.Sprite):
     - recive_attack(self, damage): обработка получения урона персонажем.
     - collide(self, xvel, yvel, platforms, attack, screen): обработка столкновений с платформами и объектами.
     """
+
     def __init__(self, x, y, screen, username, exp):
         sprite.Sprite.__init__(self)
 
         """
-           Конструктор класса Player для отображения игрока.
+         Конструктор класса Player для отображения игрока.
 
-           Параметры:
-           - x, y: начальные координаты игрока.
-           - screen: поверхность, на которой отображается игра.
-           - username: имя игрока.
-           - exp: опыт игрока.
+            Параметры:
+            - x: Начальная координата по горизонтали игрока.
+            :type x: float
+        
+            - y: Начальная координата по вертикали игрока.
+            :type y: float
+        
+            - screen: Поверхность, на которой отображается игра.
+            :type screen: Surface
+        
+            - username: Имя игрока.
+            :type username: str
+        
+            - exp: Опыт игрока.
+            :type exp: int
            """
 
         self.username = username
@@ -315,7 +356,8 @@ class Player(sprite.Sprite):
            :param screen: Поверхность, на которой отображается игра.
            """
         for p in platforms:
-            if sprite.collide_rect(self, p) and not isinstance(p, Teleport) and not isinstance(p, Gate):  # если есть пересечение платформы с игроком
+            if sprite.collide_rect(self, p) and not isinstance(p, Teleport) and not isinstance(p,
+                                                                                               Gate):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
                     if attack:
                         p.hp -= 3
@@ -368,11 +410,21 @@ class AttackEffect(sprite.Sprite):
     """
         Класс AttackEffect представляет эффект атаки игрока.
 
-        Atributes:
-        - player: объект игрока, относительно которого отображается эффект
-        - image: изображение эффекта
-        - rect: прямоугольник, описывающий положение и размер эффекта на экране
-        - boltAnimAttack: анимация эффекта атаки
+
+        Класс Effect представляет эффект атаки, отображаемый относительно объекта игрока.
+
+        Attributes:
+        - player: Объект игрока, относительно которого отображается эффект.
+        :type player: Player
+
+        - image: Изображение эффекта.
+        :type image: Surface
+
+        - rect: Прямоугольник, описывающий положение и размер эффекта на экране.
+        :type rect: Rect
+
+        - boltAnimAttack: Анимация эффекта атаки.
+        :type boltAnimAttack: pyganim.PygAnimation
 
         Metods:
         - __init__(self, player): конструктор класса
@@ -481,20 +533,28 @@ class AttackEffect(sprite.Sprite):
 
 class StatusBar(sprite.Sprite):
     """
-    Класс StatusBar представляет статус-панель игрока.
+      Класс StatusBar представляет статус-панель игрока.
 
-    Atributes:
-    - x: координата X верхнего левого угла панели
-    - y: координата Y верхнего левого угла панели
-    - screen: объект экрана Pygame
-    - font: шрифт для отображения текста на панели
-    - image: изображение панели с прозрачным фоном
-    - rect: прямоугольник, описывающий положение и размер панели на экране
+      Attributes:
+      - x: Координата X верхнего левого угла панели.
+      :type x: int
 
-    Metods:
-    - __init__(self, x, y, screen): конструктор класса
-    - update(self, player, time): обновление содержимого панели
-    """
+      - y: Координата Y верхнего левого угла панели.
+      :type y: int
+
+      - screen: Объект экрана Pygame.
+      :type screen: pygame.Surface
+
+      - font: Шрифт для отображения текста на панели.
+      :type font: pygame.font.Font
+
+      - image: Изображение панели с прозрачным фоном.
+      :type image: pygame.Surface
+
+      - rect: Прямоугольник, описывающий положение и размер панели на экране.
+      :type rect: pygame.Rect
+      """
+
     def __init__(self, x, y, screen):
         """
         Инициализация экземпляра класса StatusBar.
@@ -537,4 +597,3 @@ class StatusBar(sprite.Sprite):
         self.screen.blit(exp_text, (self.rect.x + 10, self.rect.y + 40))
         self.screen.blit(time_text, (self.rect.x + 10, self.rect.y + 70))
         self.screen.blit(fps_text, (self.rect.x + 10, self.rect.y + 100))
-

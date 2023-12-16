@@ -2,6 +2,7 @@ import unittest
 import pygame
 from player import Player
 
+
 class TestPlayer(unittest.TestCase):
 
     def setUp(self):
@@ -15,7 +16,6 @@ class TestPlayer(unittest.TestCase):
         exp = 0
 
         self.player = Player(x, y, screen, username, exp)
-
 
     def test_move_left(self):
         initial_x = self.player.rect.x
@@ -44,10 +44,9 @@ class TestPlayer(unittest.TestCase):
         # Check if the image has changed during the attack
         self.assertNotEqual(initial_image, self.player.image)
 
-
-
     def tearDown(self):
         pygame.quit()
+
 
 if __name__ == '__main__':
     unittest.main()

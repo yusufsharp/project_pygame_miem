@@ -7,7 +7,6 @@ from .serializers import PlayerSerializer
 from django.contrib.auth.hashers import make_password
 
 
-
 class IndexViewTest(TestCase):
     def test_index_view_uses_correct_template(self):
         response = self.client.get(reverse('index'))
@@ -18,13 +17,13 @@ class IndexViewTest(TestCase):
         response = self.client.get(reverse('index'), {'some_param': 'lol'})
         self.assertTemplateUsed(response, 'myapp/index.html')
 
+
 class PlayerViewSetTest(TestCase):
     def setUp(self):
         self.player1 = Player.objects.create(login='player1')
         self.player2 = Player.objects.create(login='player2')
 
         self.client = APIClient()
-
 
     def test_player_list_view(self):
         # Получаем URL для списка игроков
@@ -39,6 +38,7 @@ class PlayerViewSetTest(TestCase):
         # Проверяем, что полученные данные соответствуют ожидаемым данным
         expected_data = PlayerSerializer([self.player1, self.player2], many=True).data
         self.assertEqual(response.data, expected_data)
+
 
 class ItemAPIViewTest(TestCase):
     def setUp(self):
@@ -69,7 +69,8 @@ class UpdateAchievesViewTest(TestCase):
         self.player = Player.objects.create(login=self.login)
 
     def test_patch_achieves_invalid_key(self):
-        url = reverse('update-achieves', kwargs={'login': self.login, 'achieve_type': self.achieve_type, 'type_value': self.type_value})
+        url = reverse('update-achieves',
+                      kwargs={'login': self.login, 'achieve_type': self.achieve_type, 'type_value': self.type_value})
         key = "lol_key"
 
         response = self.client.patch(url, params={'key': key})
