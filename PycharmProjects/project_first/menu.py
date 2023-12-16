@@ -609,6 +609,14 @@ def death_screen(screen):
 
 
 def its_time_to_go(screen, final_value):
+    """
+        Отображает затухающий оверлей с уменьшающимся текстом, когда приходит время закончить эту игру...
+
+        :param screen: Поверхность Pygame.
+        :type screen: pygame.Surface
+        :param final_value: Значение, которое будет отображено в сообщении перед выходом.
+        :type final_value: int
+        """
     duration = 5000
     overlay = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
     overlay.fill((0, 0, 0))
