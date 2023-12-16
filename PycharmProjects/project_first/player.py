@@ -371,7 +371,7 @@ class StatusBar(sprite.Sprite):
         self.font = pygame.font.SysFont('Corbel', 25)
         self.image = Surface((200, 200), pygame.SRCALPHA)
         self.image.set_colorkey(Color(COLOR))
-        self.rect = Rect(x, y, 160, 130)
+        self.rect = Rect(x, y, 320, 130)
         self.screen = screen
 
     def update(self, player, time):
@@ -390,5 +390,3 @@ class StatusBar(sprite.Sprite):
         self.screen.blit(time_text, (self.rect.x + 10, self.rect.y + 70))
         self.screen.blit(fps_text, (self.rect.x + 10, self.rect.y + 100))
 
-
-ANIMATION_COIN = [f'objects/Coin-{i}.png' for i in range(1, 8)]
