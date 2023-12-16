@@ -606,3 +606,35 @@ def death_screen(screen):
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)
+
+
+def its_time_to_go(screen, final_value):
+    duration = 5000
+    overlay = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+    overlay.fill((0, 0, 0))
+    alpha = 0
+    start_time = pg.time.get_ticks()
+
+    while alpha <= 255:
+        elapsed_time = pg.time.get_ticks() - start_time
+        if elapsed_time >= duration:
+            break
+        progress = 1 - math.sin((elapsed_time / duration) * math.pi / 2)
+        some_font = pg.font.Font('fonts/thin_pixel-7.ttf', int((72 + progress * 404) * (WINDOW_WIDTH / 1080)))
+        alpha = int(progress * 255)
+        overlay.set_alpha(alpha)
+        radius = progress * WINDOW_WIDTH
+        alpha = int((1 - progress) * 255)
+        screen.blit(overlay, (0, 0))
+        pg.draw.circle(overlay, (200, 200, 200, alpha), (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2), int(radius))
+        overlay_rect = overlay.get_rect()
+        print_text_in_bar(screen, some_font, f"ТЫ КОНЧИЛ СО СЧЕТОМ: {final_value}!", overlay_rect, clr=(255, 255, 255))
+
+        pg.display.flip()
+
+        for some_event in pg.event.get():
+            if some_event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+
+        pg.time.Clock().tick(60)
