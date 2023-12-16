@@ -499,10 +499,10 @@ def menu_rating_func(some_font, screen):
     for elm in db:
         del elm['password']
         del elm['achieves']['id']
-        health = elm['achieves']['health']
-        del elm['achieves']['health']
-        elm['achieves']['health'] = health
-    db = sorted(db, key=lambda item: item['achieves']['points'], reverse=True)
+        elm_final = elm['achieves'][final_score]
+        del elm['achieves'][final_score]
+        elm['achieves'][final_score] = elm_final
+    db = sorted(db, key=lambda item: item['achieves'][final_score], reverse=True)
     scroll = 0
     anima = True
     while menu_rating:

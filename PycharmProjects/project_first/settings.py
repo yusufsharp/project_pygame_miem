@@ -10,7 +10,7 @@ WINDOW_HEIGHT = 1080
 
 FPS = 60
 FPS_CLOCK = pygame.time.Clock()
-
+final_score = 'health'
 BACKGROUND_IMAGE = 'images/Background.jpg'
 BACKGROUND_COLOR = '#320236'
 PLATFORM_WIDTH = 32
@@ -249,7 +249,7 @@ level3 = [
     '/                                                                                                                                                      \\',
     '/                                                                                                                                                      \\',
     '/                                                                                                                                                      \\',
-    '/                                                   E                                                                                                  \\',
+    '/                                                                                                                                                      \\',
     '/                                                                                                                                                      \\',
     '/                                            @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                               \\',
     '/                                            SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS                               \\',
@@ -279,7 +279,7 @@ level3 = [
     '/                                                                                                                                                      \\',
     '/                                                                                                                                                      \\',
     '/                                                                    g                         g                                                       \\',
-    '/                                 /                                                                                                                    \\',
+    '/                                 /                                                                   E                                                \\',
     '/                                 /               n      m                                                                                             \\',
     '/@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\\',
     '/SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS\\',

@@ -1,6 +1,6 @@
 import sys
 from pygame import *
-from blocks import Platform, MovingPlatform, Lava, Teleport, Thorns
+from blocks import Platform, MovingPlatform, Lava, Teleport, Thorns, Gate
 from enemies import *
 from settings import *
 import pygame
@@ -89,6 +89,7 @@ class Player(sprite.Sprite):
         self.onGround = False  # На земле ли я?
         self.next_level = False
         self.restart = False
+        self.end_game = False
 
         self.image = Surface((WIDTH, HEIGHT))
         self.image.fill(Color(COLOR))
@@ -254,8 +255,7 @@ class Player(sprite.Sprite):
                 - screen: поверхность, на которой отображается игра
         """
         for p in platforms:
-            if sprite.collide_rect(self, p) and not isinstance(p,
-                                                               Teleport):  # если есть пересечение платформы с игроком
+            if sprite.collide_rect(self, p) and not isinstance(p, Teleport) and not isinstance(p, Gate):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
                     if attack:
                         p.hp -= 3
@@ -300,6 +300,8 @@ class Player(sprite.Sprite):
 
             if sprite.collide_rect(self, p) and isinstance(p, Teleport):
                 self.next_level = True
+            if sprite.collide_rect(self, p) and isinstance(p, Gate):
+                self.end_game = True
 
 
 class AttackEffect(sprite.Sprite):
