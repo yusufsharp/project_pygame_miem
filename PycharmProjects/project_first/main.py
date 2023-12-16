@@ -19,15 +19,15 @@ pygame.display.set_icon(icon)
 
 # marat
 
-def load_level(level, screen, username, current_level):
+def load_level(level, screen, username, current_level, exp_data=0):
     global entities, platforms, hero, monsters, moving_platforms, status, attack_effect, reg
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
     exp = 0
     if current_level != 0:
-        exp = stat_request(username)['points']
+        exp = exp_data
     hero = Player(1064, 1700, screen, username, exp)  # создаем героя по (x,y) координатам
-    status = StatusBar(1700, 85, screen)
+    status = StatusBar(1600, 85, screen)
     attack_effect = AttackEffect(hero)
 
     monsters = pygame.sprite.Group()
@@ -115,7 +115,10 @@ def main():
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         if not reg:
             reg, username = menu_func()
-            load_level(levels[current_level], screen, username, current_level)
+            stat_dict = stat_request(username)
+            current_level = stat_dict['experience']
+            exp_data = stat_dict['points']
+            load_level(levels[current_level], screen, username, current_level, exp_data=exp_data)
             print(f'ИМЯ ПОЛЬЗОВАТЕЛЯ: {username}')
             print(stat_request(username))
             start_time = pygame.time.get_ticks()
@@ -147,9 +150,9 @@ def main():
 
         if hero.restart:
             start_time = pygame.time.get_ticks()
-            load_level(levels[current_level], screen, username, current_level)
+            load_level(levels[current_level], screen, username, current_level, exp_data=hero.exp)
             hero.restart = False
-            left = right = up = False
+            left = right = up = attack = False
         bg.fill(Color(BACKGROUND_COLOR))
         screen.blit(background_image, (0, 0))
         screen.blit(overlay, (0, 0))
@@ -160,12 +163,11 @@ def main():
             send_patch_request(username, 'completion_time', (pygame.time.get_ticks() - start_time) // 1000)
             send_patch_request(username, 'experience', 1)
             send_patch_request(username, 'points', hero.exp)
-            hero.exp = 0
             animation_thread.join()
             left = right = up = False
             print(stat_request(username))
             current_level += 1
-            load_level(levels[current_level], screen, username, current_level)
+            load_level(levels[current_level], screen, username, current_level, exp_data=hero.exp)
             hero.next_level = False
 
         camera.update(hero)
