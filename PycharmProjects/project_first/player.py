@@ -36,6 +36,19 @@ color_white = (255, 255, 255)
 
 
 class HealthBar():
+    """
+    Класс HealthBar представляет полосу здоровья для отображения состояния здоровья игрока.
+
+    Атрибуты:
+    - x, y: координаты верхнего левого угла полосы здоровья
+    - w, h: ширина и высота полосы здоровья
+    - hp: текущее количество здоровья игрока
+    - max_hp: максимальное количество здоровья игрока
+
+    Методы:
+    - __init__(self, x, y, w, h, max_hp): конструктор класса
+    - draw(self, surface): отрисовка полосы здоровья на экране
+    """
     def __init__(self, x, y, w, h, max_hp):
         """
                 Класс HealthBar для отображения здоровья игрока.
@@ -65,6 +78,33 @@ class HealthBar():
 
 
 class Player(sprite.Sprite):
+    """
+        Класс Player представляет игрового персонажа.
+
+        Атрибуты:
+        - xvel: скорость перемещения по горизонтали
+        - startX: начальная позиция по горизонтали
+        - startY: начальная позиция по вертикали
+        - yvel: скорость перемещения по вертикали
+        - onGround: флаг, указывающий, находится ли персонаж на земле
+        - next_level: флаг, указывающий, что персонаж перешел на следующий уровень
+        - restart: флаг, указывающий, что нужно перезапустить игру
+        - image: изображение персонажа
+        - rect: прямоугольник, описывающий положение и размер персонажа на экране
+        - direction: направление персонажа (True - вправо, False - влево)
+        - on_moving_platform: флаг, указывающий, находится ли персонаж на подвижной платформе
+        - exp: опыт игрока
+        - time: время, проведенное в игре в формате 'минуты:секунды'
+        - health_bar: полоса здоровья персонажа
+
+        Методы:
+        - __init__(self, x, y, screen, username, exp): конструктор класса
+        - draw_health_bar(self, surface): отрисовка полосы здоровья на указанной поверхности
+        - update(self, left, right, up, platforms, attack, screen, username): обновление состояния персонажа
+        - die(self, screen): обработка смерти персонажа
+        - recive_attack(self, damage): обработка получения урона персонажем
+        - collide(self, xvel, yvel, platforms, attack, screen): обработка столкновений с платформами и объектами
+    """
     def __init__(self, x, y, screen, username, exp):
         sprite.Sprite.__init__(self)
 
@@ -303,8 +343,29 @@ class Player(sprite.Sprite):
 
 
 class AttackEffect(sprite.Sprite):
+    """
+     Класс AttackEffect представляет эффект атаки игрока.
+
+     Атрибуты:
+     - player: объект игрока, относительно которого отображается эффект
+     - image: изображение эффекта
+     - rect: прямоугольник, описывающий положение и размер эффекта на экране
+     - boltAnimAttack: анимация атаки
+
+     Методы:
+     - __init__(self, player): конструктор класса
+     - update(self, attack, platforms, hero): обновление состояния эффекта
+     - collide(self, platforms, attack, hero): обработка столкновений эффекта с объектами
+     - draw(self, attack, surface): отрисовка эффекта на указанной поверхности
+     """
     def __init__(self, player):
         super().__init__()
+        """
+              Инициализация экземпляра класса AttackEffect.
+
+              Параметры:
+              - player: объект игрока, относительно которого отображается эффект
+        """
 
         self.player = player
         self.image = Surface((ATTACK_WIDTH, ATTACK_HEIGHT))
@@ -324,7 +385,14 @@ class AttackEffect(sprite.Sprite):
         self.rect.centery = self.player.rect.centery
 
     def update(self, attack, platforms, hero):
-        current_time = pygame.time.get_ticks()
+        """
+               Обновление состояния эффекта атаки.
+
+               Параметры:
+               - attack: флаг атаки
+               - platforms: список платформ в уровне
+               - hero: объект игрока
+               """
         if attack:
             if self.player.direction:
                 self.rect.centerx = self.player.rect.centerx + 64
@@ -341,6 +409,14 @@ class AttackEffect(sprite.Sprite):
         self.collide(platforms, attack, hero)
 
     def collide(self, platforms, attack, hero):
+        """
+        Обработка столкновений эффекта атаки с объектами.
+
+        Параметры:
+        - platforms: список платформ в уровне
+        - attack: флаг атаки
+        - hero: объект игрока
+        """
         for p in platforms:
             if sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
                 if isinstance(p, Enemy):
@@ -363,12 +439,42 @@ class AttackEffect(sprite.Sprite):
                             hero.exp += 20
 
     def draw(self, attack, surface):
+        """
+            Отрисовка эффекта атаки на указанной поверхности.
+
+            Параметры:
+            - attack: флаг атаки
+            - surface: поверхность для отрисовки
+            """
         if attack:
             surface.blit(self.image, self.rect.topleft)
 
 
 class StatusBar(sprite.Sprite):
+    """
+    Класс StatusBar представляет статус-панель игрока.
+
+    Атрибуты:
+    - x: координата X верхнего левого угла панели
+    - y: координата Y верхнего левого угла панели
+    - screen: объект экрана Pygame
+    - font: шрифт для отображения текста на панели
+    - image: изображение панели с прозрачным фоном
+    - rect: прямоугольник, описывающий положение и размер панели на экране
+
+    Методы:
+    - __init__(self, x, y, screen): конструктор класса
+    - update(self, player, time): обновление содержимого панели
+    """
     def __init__(self, x, y, screen):
+        """
+          Инициализация экземпляра класса StatusBar.
+
+          Параметры:
+          - x: координата X верхнего левого угла панели
+          - y: координата Y верхнего левого угла панели
+          - screen: объект экрана Pygame
+          """
         sprite.Sprite.__init__(self)
         self.font = pygame.font.SysFont('Corbel', 25)
         self.image = Surface((200, 200), pygame.SRCALPHA)
@@ -377,6 +483,13 @@ class StatusBar(sprite.Sprite):
         self.screen = screen
 
     def update(self, player, time):
+        """
+          Обновление содержимого статус-панели.
+
+          Параметры:
+          - player: объект игрока
+          - time: текущее время игры
+          """
         username_text = self.font.render(f"USERNAME: {player.username}", True, (255, 255, 255))
         exp_text = self.font.render(f"EXP: {player.exp}", True, (255, 255, 255))
         total_seconds = time // 1000

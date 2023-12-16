@@ -1,3 +1,41 @@
+"""
+Основной модуль игры.
+
+Содержит инициализацию, основной цикл и загрузку уровней.
+
+Модули:
+- menu: Модуль для работы с пользовательским меню.
+- player: Модуль, содержащий классы Player, StatusBar, AttackEffect и HealthBar.
+- blocks: Модуль с классами платформ и препятствий.
+- threading: Модуль для работы с многозадачностью.
+
+Глобальные переменные:
+- pg: Инициализация Pygame.
+- background_image: Задний фон игры.
+- overlay: Полупрозрачное затемнение для подложки.
+- screen: Экран Pygame.
+- icon: Иконка приложения.
+
+Функции:
+- load_level(level, screen, username, current_level, exp_data=0): Загружает уровень, создает персонажа, статус-бар и эффект атаки.
+- Camera: Класс для работы с камерой игры.
+- camera_configure(camera, target_rect): Конфигурирует положение камеры относительно персонажа.
+- main(): Основной цикл игры.
+
+Переменные:
+- current_level: Текущий уровень.
+- run: Флаг, указывающий на выполнение основного цикла.
+- username: Имя пользователя.
+- reg: Флаг, указывающий на необходимость регистрации пользователя.
+- attack, left, right, up: Флаги состояний клавиш управления.
+- total_level_width, total_level_height: Общая ширина и высота уровня.
+- camera: Экземпляр класса Camera для управления камерой.
+- start_time: Время начала уровня.
+- clock: Таймер для ограничения частоты кадров.
+
+Запуск игры:
+- Вызывает функцию main(), запускающую основной цикл игры.
+"""
 from menu import *
 from player import AttackEffect
 from player import Player, StatusBar
@@ -20,6 +58,26 @@ pygame.display.set_icon(icon)
 # marat
 
 def load_level(level, screen, username, current_level, exp_data=0):
+    """
+    Загружает уровень и создает соответствующие объекты, такие как платформы, монстры и герой.
+
+    Параметры:
+    - level: Список строк, представляющих уровень.
+    - screen: Экран Pygame.
+    - username: Имя пользователя.
+    - current_level: Текущий уровень.
+    - exp_data: Дополнительные данные опыта (по умолчанию 0).
+
+    Глобальные переменные:
+    - entities: Группа спрайтов для всех объектов на уровне.
+    - platforms: Список платформ на уровне.
+    - hero: Объект игрока.
+    - monsters: Группа монстров.
+    - moving_platforms: Список подвижных платформ.
+    - status: Объект статус-бара.
+    - attack_effect: Объект эффекта атаки.
+
+    """
     global entities, platforms, hero, monsters, moving_platforms, status, attack_effect, reg
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
@@ -85,18 +143,60 @@ def load_level(level, screen, username, current_level, exp_data=0):
 
 
 class Camera(object):
+    """
+    Класс Camera представляет собой камеру для отслеживания и перемещения по игровому миру.
+
+    Attributes:
+    - camera_func: Функция для обновления положения камеры.
+    - state: Прямоугольник, представляющий текущее состояние камеры (положение и размеры).
+
+    Methods:
+    - apply(target): Применяет положение камеры к цели.
+    - update(target): Обновляет положение камеры относительно цели.
+    """
     def __init__(self, camera_func, width, height):
+        """
+        Инициализирует объект камеры.
+
+        Параметры:
+        - camera_func: Функция для обновления положения камеры.
+        - width: Ширина камеры.
+        - height: Высота камеры.
+        """
         self.camera_func = camera_func
         self.state = Rect(0, 0, width, height)
 
     def apply(self, target):
+        """
+         Применяет положение камеры к цели.
+
+         Параметры:
+         - target: Объект, к которому применяется камера.
+
+         Возвращает Rect: Прямоугольник с новыми координатами объекта после применения камеры.
+         """
         return target.rect.move(self.state.topleft)
 
     def update(self, target):
+        """
+         Обновляет положение камеры относительно цели.
+
+         Параметры:
+         - target: Объект, к которому привязана камера.
+         """
         self.state = self.camera_func(self.state, target.rect)
 
 
 def camera_configure(camera, target_rect):
+    """
+    Функция для конфигурации положения камеры относительно цели.
+
+    Параметры:
+    - camera: Прямоугольник, представляющий текущее состояние камеры (положение и размеры).
+    - target_rect: Прямоугольник, представляющий цель, к которой привязана камера.
+
+    Возвращает Rect: Новый прямоугольник, представляющий положение камеры после конфигурации.
+    """
     l, t, _, _ = target_rect
     _, _, w, h = camera
     l, t = -l + WINDOW_WIDTH / 2, -t + WINDOW_HEIGHT / 2
@@ -105,6 +205,11 @@ def camera_configure(camera, target_rect):
 
 
 def main():
+    """
+     Основная функция игры.
+
+     Управляет основным циклом игры, обрабатывает события и обновляет экран.
+     """
     current_level = 0
     run = True
     username = 't'

@@ -11,7 +11,27 @@ MONSTER_HEIGHT = 24
 
 
 class Enemy(sprite.Sprite):
+    """
+    Класс, представляющий простого врага (Enemy) в игре.
+
+    Параметры:
+    - x, y: начальные координаты врага.
+    - left, up: начальная скорость врага по горизонтали и вертикали.
+    - maxLengthLeft: максимальное расстояние, которое враг может пройти в одну сторону по горизонтали.
+    - maxLengthUp: максимальное расстояние, которое враг может пройти в одну сторону по вертикали.
+    - hp: количество очков здоровья врага.
+    """
     def __init__(self, x, y, left, up, maxLengthLeft, maxLengthUp, hp):
+        """
+        Инициализирует объект врага.
+
+        Параметры:
+        - x, y: начальные координаты врага.
+        - left, up: начальная скорость врага по горизонтали и вертикали.
+        - maxLengthLeft: максимальное расстояние, которое враг может пройти в одну сторону по горизонтали.
+        - maxLengthUp: максимальное расстояние, которое враг может пройти в одну сторону по вертикали.
+        - hp: количество очков здоровья врага.
+        """
         sprite.Sprite.__init__(self)
         self.image = Surface((24, 24))
         self.image.fill(Color(ENEMY_COLOR))
@@ -32,6 +52,12 @@ class Enemy(sprite.Sprite):
         self.hp = hp
 
     def update(self, platforms):
+        """
+            Обновляет положение и состояние врага.
+
+            Параметры:
+            - platforms: список платформ в игре.
+            """
 
         self.image.fill(Color(ENEMY_COLOR))
         self.boltAnim.blit(self.image, (0, 0))
@@ -47,6 +73,12 @@ class Enemy(sprite.Sprite):
             self.yvel = -self.yvel  # если прошли максимальное растояние, то идеи в обратную сторону, вертикаль
 
     def collide(self, platforms):
+        """
+            Проверяет столкновение врага с платформами.
+
+            Параметры:
+            - platforms: список платформ в игре.
+            """
         for p in platforms:
             if sprite.collide_rect(self, p) and self != p:
                 self.xvel = - self.xvel
@@ -56,6 +88,9 @@ class Enemy(sprite.Sprite):
                     self.die()
 
     def die(self):
+        """
+              Обрабатывает смерть врага.
+              """
         if self.hp <= 0:
             self.remove()
             self.kill()
@@ -70,7 +105,44 @@ ANIMATION_GOLEM_DIE = [f'assets_sprites/enemy2/en2_d/en2_die{i}.png' for i in ra
 
 
 class Enemy2(sprite.Sprite):
+    """
+    Класс, представляющий второго врага в игре.
+
+    Атрибуты:
+    - image: изображение врага.
+    - rect: прямоугольник, определяющий положение и размеры врага.
+    - startX, startY: начальные координаты врага.
+    - maxLengthLeft: максимальное расстояние, которое враг может пройти в одну сторону по горизонтали.
+    - maxLengthUp: максимальное расстояние, которое враг может пройти в одну сторону по вертикали.
+    - xvel, yvel: скорость движения врага по горизонтали и вертикали.
+    - direction: направление движения врага (True - влево, False - вправо).
+    - hp: количество очков здоровья врага.
+    - start_time: время начала существования врага.
+    - elapsed_time: прошедшее время с начала существования врага.
+    - paused: флаг паузы (True - враг приостановлен).
+    - player: объект игрока, за которым будет охотиться враг.
+    - attack_range: расстояние, на котором враг начнет атаковать игрока.
+    - attack_distance: дистанция атаки врага.
+
+    Методы:
+    - __init__: инициализация объекта врага.
+    - collide: обработка столкновений врага с платформами.
+    - die: обработка смерти врага.
+    - update: обновление состояния врага.
+    - attack_animation: анимация атаки врага.
+    """
     def __init__(self, x, y, left, up, maxLengthLeft, maxLengthUp, player, hp):
+        """
+         Инициализирует объект второго врага.
+
+         Параметры:
+         - x, y: начальные координаты врага.
+         - left, up: начальная скорость врага по горизонтали и вертикали.
+         - maxLengthLeft: максимальное расстояние, которое враг может пройти в одну сторону по горизонтали.
+         - maxLengthUp: максимальное расстояние, которое враг может пройти в одну сторону по вертикали.
+         - player: объект игрока, за которым будет охотиться враг.
+         - hp: количество очков здоровья врага.
+         """
         sprite.Sprite.__init__(self)
         self.image = Surface((96, 96))
         self.image.fill(Color(ENEMY_COLOR))
@@ -138,6 +210,12 @@ class Enemy2(sprite.Sprite):
         self.boltAnimAttackLeft.play()
 
     def collide(self, platforms):
+        """
+        Обработка столкновений врага с платформами.
+
+        Параметры:
+        - platforms: список платформ, с которыми может столкнуться враг.
+        """
         for p in platforms:
             if sprite.collide_rect(self, p) and self != p:
                 self.xvel = - self.xvel
@@ -147,10 +225,22 @@ class Enemy2(sprite.Sprite):
                     self.die(platforms)
 
     def die(self, platforms):
+        """
+        Обработка смерти врага.
+
+        Параметры:
+        - platforms: список платформ, с которыми может столкнуться враг.
+        """
         self.kill()
         platforms.remove(self)
 
     def update(self, platforms):
+        """
+         Обновление состояния врага.
+
+         Параметры:
+         - platforms: список платформ, с которыми может столкнуться враг.
+         """
 
         player_distance = math.sqrt((self.rect.x - self.player.rect.x) ** 2 + (self.rect.y - self.player.rect.y) ** 2)
 
@@ -175,6 +265,7 @@ class Enemy2(sprite.Sprite):
                 self.direction = not self.direction
 
     def attack_animation(self):
+        """Анимация атаки врага."""
         self.image.fill(Color(ENEMY_COLOR))
         if self.player.direction:
             self.boltAnimAttackLeft.blit(self.image, (0, 0))
