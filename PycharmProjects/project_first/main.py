@@ -4,10 +4,10 @@ from blocks import *
 from settings import *
 from pygame.locals import *
 from player import Player
-from menu import menu_func, death_screen, stat_request
 from player import AttackEffect
-from player import Player, Coin, StatusBar
-
+from menu import *
+from player import Player, StatusBar
+import threading
 pg.init()
 
 background_image = pg.image.load(BACKGROUND_IMAGE)
@@ -21,13 +21,14 @@ icon = pygame.image.load('images/icon.png')
 pygame.display.set_icon(icon)
 
 #marat
-
-def load_level(level):
-    global entities, platforms, hero, monsters, moving_platform, status, attack_effect
+def load_level(level, screen, username, current_level, exp_data=0):
+    global entities, platforms, hero, monsters, moving_platforms, status, attack_effect, reg
     entities = pygame.sprite.Group()
     platforms = []  # создаем героя по (x,y) координатам
-
-    hero = Player(1064, 2000, username = 'Дрочеслав')  # создаем героя по (x,y) координатам
+    exp = 0
+    if current_level != 0:
+        exp = exp_data
+    hero = Player(1064, 1700, screen, username, exp)  # создаем героя по (x,y) координатам
     status = StatusBar(800, 900, screen)
     attack_effect = AttackEffect(hero)
 
@@ -42,7 +43,7 @@ def load_level(level):
     x = y = 0
     for row in level:
         for col in row:
-            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g':
+            if col != ' ' and col != 'L' and col != 'T' and col != 'm' and col != 'g' and col != 'p' and col != 'n' and col != 'S':
                 pf = Platform(x, y, IMGS_PLATFORM[col])
                 entities.add(pf)
                 platforms.append(pf)
@@ -64,6 +65,16 @@ def load_level(level):
                 entities.add(gm)
                 platforms.append(gm)
                 monsters.add(gm)
+            elif col == 'p':
+                moving_platform = MovingPlatform(x, y, IMGS_PLATFORM['^'], x, x + 1500, 4)
+                moving_platform.set_hero(hero)
+                entities.add(hero, moving_platform)
+                platforms.append(moving_platform)
+                moving_platforms.append(moving_platform)
+            elif col == 'S':
+                torch = Thorns(x, y)
+                entities.add(torch)
+                platforms.append(torch)
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
         x = 0
@@ -92,21 +103,22 @@ def camera_configure(camera, target_rect):
 def main():
     current_level = 0
     run = True
-    username = 'АНОНИМУС'
+    username = 't'
     reg = False
-    load_level(levels[current_level])
     attack = left = right = up = False  # по умолчанию — стоим
     total_level_width = len(levels[current_level][0]) * PLATFORM_WIDTH
     total_level_height = len(levels[current_level][0]) * PLATFORM_HEIGHT
 
     camera = Camera(camera_configure, total_level_width, total_level_height)
     while run:
-
-
         clock = pg.time.Clock()
         bg = Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         if not reg:
             reg, username = menu_func()
+            stat_dict = stat_request(username)
+            current_level = stat_dict['experience']
+            exp_data = stat_dict['points']
+            load_level(levels[current_level], screen, username, current_level, exp_data=exp_data)
             print(f'ИМЯ ПОЛЬЗОВАТЕЛЯ: {username}')
             print(stat_request(username))
         else:
@@ -135,13 +147,18 @@ def main():
                 if e.type == KEYUP and e.key == K_SPACE:
                     attack = False
 
+        if hero.restart:
+            start_time = pygame.time.get_ticks()
+            load_level(levels[current_level], screen, username, current_level, exp_data=hero.exp)
+            hero.restart = False
+            left = right = up = attack = False
         bg.fill(Color(BACKGROUND_COLOR))
         screen.blit(background_image, (0, 0)) 
         screen.blit(overlay, (0, 0))
 
         if hero.next_level and current_level == 0:
             current_level += 1
-            load_level(levels[current_level])
+            load_level(levels[current_level], screen, username, current_level, exp_data=hero.exp)
             hero.next_level = False
 
         camera.update(hero)
@@ -152,13 +169,12 @@ def main():
                 screen.blit(e.image, camera.apply(e))
 
         screen.blit(hero.image, camera.apply(hero))
-        hero.update(left, right, up, platforms, attack, screen)
-        moving_platform.update()
+        hero.update(left, right, up, platforms, attack, screen, username)
+        for mvp in moving_platforms:
+            mvp.update(len(moving_platforms))
         monsters.update(platforms)
-        hero.draw_health_bar(screen)
-        status.update(hero, clock)
+        status.update(hero, pygame.time.get_ticks() - start_time)
         attack_effect.update(attack, platforms, hero)
-
 
         pygame.display.update()
         FPS_CLOCK.tick(FPS)

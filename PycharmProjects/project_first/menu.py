@@ -154,7 +154,7 @@ def menu_func():
         :rtype: tuple(bool, str)
         """
     reg = False  # отвечает за отображение всего меню
-    username = 'АНОНИМУС'
+    username = "АНОНИМУС"
     clock = pygame.time.Clock()  # фпс
     background_image = pg.image.load('images/Background.png')
     scaled_image = pg.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))  # подгоняем изображение
@@ -588,10 +588,7 @@ def death_screen(screen):
                 if some_event.type == pg.MOUSEBUTTONDOWN:
                     if respawn_rect.collidepoint(some_event.pos):
                         # какая то функция...
-                        flag_return = True
-                        return
-        if flag_return:
-            return True
+                        return True
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)

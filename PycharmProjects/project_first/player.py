@@ -1,10 +1,10 @@
 import sys
 from pygame import *
-from blocks import Platform, MovingPlatform, Lava, Teleport
+from blocks import Platform, MovingPlatform, Lava, Teleport, Thorns
 from enemies import *
 from settings import *
 import pygame
-from menu import send_post_request, death_screen
+from menu import death_screen
 
 MOVE_SPEED = 7
 ATTACK_WIDTH = 84
@@ -52,7 +52,7 @@ class HealthBar():
 
 
 class Player(sprite.Sprite):
-    def __init__(self, x, y, screen, username):
+    def __init__(self, x, y, screen, username, exp):
         sprite.Sprite.__init__(self)
 
         self.username = username
@@ -74,9 +74,8 @@ class Player(sprite.Sprite):
         self.direction = True
         self.on_moving_platform = False
 
-        self.exp = 0
+        self.exp = exp
         total_seconds = pygame.time.get_ticks() // 1000
-        self.total_second = pygame.time.get_ticks() // 1000
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         self.time = f'{minutes}:{seconds}'
@@ -143,7 +142,7 @@ class Player(sprite.Sprite):
     def draw_health_bar(self, surface):
         self.health_bar.draw(surface)
 
-    def update(self, left, right, up, platforms, attack, screen):
+    def update(self, left, right, up, platforms, attack, screen, username):
         if up:
             if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
                 self.yvel = -JUMP_POWER
@@ -201,8 +200,6 @@ class Player(sprite.Sprite):
         self.collide(self.xvel, 0, platforms, attack, screen)
 
     def die(self, screen):
-        self.rect.x = 1064
-        self.rect.y = 1850
         self.restart = death_screen(screen)
         # send_post_request(self.username, "password", self.exp, self.health_bar.hp, self.time)
 
@@ -252,6 +249,10 @@ class Player(sprite.Sprite):
                     self.on_moving_platform = False
                 if isinstance(p, Lava):
                     self.die(screen)
+                if isinstance(p, Thorns):
+                    self.health_bar.hp -= 10
+                    if self.health_bar.hp <= 0:
+                        self.die(screen)
 
             if sprite.collide_rect(self, p) and isinstance(p, Teleport):
                 self.next_level = True
@@ -329,10 +330,10 @@ class StatusBar(sprite.Sprite):
         self.rect = Rect(x, y, 200, 100)  # You can adjust the size as needed
         self.screen = screen
 
-    def update(self, player, clock):
+    def update(self, player, time):
         username_text = self.font.render(f"USERNAME: {player.username}", True, (255, 255, 255))
         exp_text = self.font.render(f"EXP: {player.exp}", True, (255, 255, 255))
-        total_seconds = pygame.time.get_ticks() // 1000
+        total_seconds = time // 1000
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         time_text = self.font.render(f"TIME: {minutes:02}:{seconds:02}", True, (255, 255, 255))
@@ -366,12 +367,16 @@ class Coin(sprite.Sprite):
         self.AnimCoin = pyganim.PygAnimation(boltAnim)
         self.AnimCoin.play()
 
-    def update(self, hero):
-        self.collide(hero)
+    def update(self, platforms):
+        self.collide(platforms)
         self.image.set_colorkey(Color(COLOR))
+        self.image.fill(Color(COLOR))
         self.AnimCoin.blit(self.image, (0, 0))
 
-    def collide(self, hero):
-        if self.rect.colliderect(hero.rect):
-            self.kill()
-            hero.exp += 2
+    def collide(self, platforms):
+        for p in platforms:
+            if sprite.collide_rect(self, p):
+                if isinstance(self, p):
+                    self.remove(platforms)
+                    self.kill()
+                    Player.exp += 2
